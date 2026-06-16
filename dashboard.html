@@ -3,178 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Money Journal - Dashboard</title>
+    <title>Dashboard - MyExpenseJournal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
-        .premium-blur { backdrop-filter: blur(20px); background: rgba(17, 24, 39, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); }
-        .premium-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .glass-header { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.85); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .premium-card { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.04); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); transition: all 0.2s; cursor: pointer; }
         .premium-card:active { transform: scale(0.98); }
-        .modal-animate { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); transform: scale(0.9) translateY(20px); opacity: 0; }
-        .modal-active .modal-animate { transform: scale(1) translateY(0); opacity: 1; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-        input, select, button { -webkit-tap-highlight-color: transparent; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-        .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .master-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3); }
+        .page-enter { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-animate { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); transform: translateY(100%); }
+        .modal-active .modal-animate { transform: translateY(0); }
+        input, select, button { -webkit-tap-highlight-color: transparent; outline: none; }
     </style>
 </head>
-<body class="pb-28 antialiased min-h-screen">
+<body class="pb-32 antialiased min-h-screen">
 
-    <nav class="sticky top-0 z-40 premium-blur px-6 py-4 flex items-center justify-between border-b border-white/5">
+    <nav class="sticky top-0 z-40 glass-header px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10">
-                <iconify-icon icon="solar:wallet-money-bold-duotone" class="text-blue-400 text-2xl"></iconify-icon>
+            <div class="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
+                <iconify-icon icon="solar:wallet-money-bold-duotone" class="text-2xl"></iconify-icon>
             </div>
             <div>
-                <h1 class="text-base font-extrabold tracking-tight text-white">Money Journal</h1>
-                <p class="text-[10px] font-semibold text-emerald-400 mt-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Syncing Live</p>
+                <h1 class="text-base font-extrabold tracking-tight text-slate-900">Dashboard</h1>
+                <p class="text-[10px] font-bold text-emerald-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live Sync</p>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-md mx-auto px-4 pt-6 space-y-6">
-        <div class="w-full rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 p-6 shadow-xl relative overflow-hidden">
+    <main class="max-w-md mx-auto px-4 pt-6 space-y-6 page-enter">
+        <!-- Master Balance Card -->
+        <div class="w-full rounded-[2rem] master-card p-6 relative overflow-hidden">
             <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
-            <p class="text-xs font-bold text-white/70 uppercase tracking-widest">Total Net Worth</p>
-            <h2 id="totalBalance" class="text-3xl font-black text-white tracking-tight mt-1">₹0.00</h2>
+            <div class="flex justify-between items-start">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Net Worth</p>
+                <button onclick="togglePrivacy()" class="text-slate-400 hover:text-white transition-colors p-1">
+                    <iconify-icon id="privacyIcon" icon="solar:eye-linear" class="text-lg"></iconify-icon>
+                </button>
+            </div>
+            <h2 id="totalBalance" class="text-3xl font-black text-white tracking-tight mt-1 transition-all">₹0.00</h2>
             
             <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
-                <div>
-                    <p class="text-[10px] font-bold text-white/60 uppercase">Total Income</p>
-                    <p id="totalIn" class="text-sm font-bold text-emerald-300">₹0.00</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-white/60 uppercase">Total Expense</p>
-                    <p id="totalOut" class="text-sm font-bold text-rose-300">₹0.00</p>
-                </div>
+                <div><p class="text-[10px] font-bold text-slate-400 uppercase">Total Income</p><p id="totalIn" class="text-sm font-bold text-emerald-400">₹0.00</p></div>
+                <div><p class="text-[10px] font-bold text-slate-400 uppercase">Total Expense</p><p id="totalOut" class="text-sm font-bold text-rose-400">₹0.00</p></div>
             </div>
         </div>
 
+        <!-- Budget Progress -->
         <div>
-            <div class="flex justify-between items-center mb-3 px-1">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Wallets & Accounts</h3>
+            <div class="flex justify-between items-center mb-2 px-1">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Monthly Budget</h3>
+                <span id="budgetStatus" class="text-[10px] font-bold text-slate-500">₹0 / ₹25,000</span>
             </div>
+            <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                <div id="budgetBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500 w-0"></div>
+            </div>
+        </div>
+
+        <!-- Wallets -->
+        <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">Wallets</h3>
             <div class="grid grid-cols-2 gap-3">
-                <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400"><iconify-icon icon="solar:banknote-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">Cash</p><p id="walletCash" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                <div class="premium-card rounded-[1.5rem] p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center"><iconify-icon icon="solar:banknote-linear" class="text-xl"></iconify-icon></div>
+                    <div><p class="text-[10px] font-bold text-slate-500">Cash</p><p id="walletCash" class="text-sm font-extrabold text-slate-800">₹0</p></div>
                 </div>
-                <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400"><iconify-icon icon="solar:qr-code-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">UPI</p><p id="walletUPI" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                <div class="premium-card rounded-[1.5rem] p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center"><iconify-icon icon="solar:qr-code-linear" class="text-xl"></iconify-icon></div>
+                    <div><p class="text-[10px] font-bold text-slate-500">UPI</p><p id="walletUPI" class="text-sm font-extrabold text-slate-800">₹0</p></div>
                 </div>
-                <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400"><iconify-icon icon="solar:bank-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">Bank</p><p id="walletBank" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                <div class="premium-card rounded-[1.5rem] p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center"><iconify-icon icon="solar:bank-linear" class="text-xl"></iconify-icon></div>
+                    <div><p class="text-[10px] font-bold text-slate-500">Bank</p><p id="walletBank" class="text-sm font-extrabold text-slate-800">₹0</p></div>
                 </div>
-                <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400"><iconify-icon icon="solar:card-transfer-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">Card</p><p id="walletCard" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                <div class="premium-card rounded-[1.5rem] p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center"><iconify-icon icon="solar:card-transfer-linear" class="text-xl"></iconify-icon></div>
+                    <div><p class="text-[10px] font-bold text-slate-500">Card</p><p id="walletCard" class="text-sm font-extrabold text-slate-800">₹0</p></div>
                 </div>
             </div>
         </div>
 
+        <!-- Ledger -->
         <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-1">Recent Activity</h3>
-            <p class="text-[10px] text-slate-500 px-1 mb-2">Tap any item to edit or delete</p>
-            <div id="transactionContainer" class="space-y-2.5 max-h-[350px] overflow-y-auto custom-scroll pr-1">
-                <div class="rounded-2xl p-4 shimmer h-16 w-full mb-2"></div>
-                <div class="rounded-2xl p-4 shimmer h-16 w-full mb-2"></div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">Recent Activity</h3>
+            <div id="transactionContainer" class="space-y-3 pb-4">
+                <div class="text-center py-6 text-slate-400 text-sm"><iconify-icon icon="solar:spinner-linear" class="animate-spin text-2xl"></iconify-icon></div>
             </div>
         </div>
     </main>
 
-    <button onclick="openModal()" class="fixed bottom-24 right-6 z-50 h-14 w-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center active:scale-95 transition-all">
-        <iconify-icon icon="solar:add-circle-bold" class="text-2xl"></iconify-icon>
+    <!-- Floating Action Button -->
+    <button onclick="openModal()" class="fixed bottom-28 right-6 z-40 h-14 w-14 bg-emerald-600 text-white rounded-full shadow-lg shadow-emerald-600/30 flex items-center justify-center active:scale-95 transition-transform">
+        <iconify-icon icon="solar:add-circle-bold" class="text-3xl"></iconify-icon>
     </button>
 
-    <!-- NEW FULL NAVIGATION -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 premium-blur border-t border-white/5 px-6 py-3 flex items-center justify-around max-w-md mx-auto rounded-t-3xl">
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-blue-400">
-            <iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Home</span>
-        </a>
-        <a href="history.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
-            <iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">History</span>
-        </a>
-        <a href="analytics.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
-            <iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Analysis</span>
-        </a>
-        <a href="settings.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
-            <iconify-icon icon="solar:settings-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Settings</span>
-        </a>
-    </nav>
+    <!-- Floating Pill Navigation -->
+    <div class="fixed bottom-6 inset-x-0 z-40 flex justify-center px-6 pointer-events-none">
+        <nav class="w-full max-w-md bg-white/90 backdrop-blur-xl border border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between pointer-events-auto">
+            <a href="dashboard.html" class="flex flex-col items-center gap-1 text-emerald-600"><iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon></a>
+            <a href="history.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600"><iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon></a>
+            <a href="analytics.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600"><iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon></a>
+            <a href="settings.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600"><iconify-icon icon="solar:settings-linear" class="text-xl"></iconify-icon></a>
+        </nav>
+    </div>
 
-    <!-- Unified Modal for Add / Edit / Transfer -->
-    <div id="txModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="w-full max-w-md bg-slate-900 border-t border-white/10 rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
-            <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
+    <!-- Light Theme Modal -->
+    <div id="txModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="w-full max-w-md bg-white rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
             
             <div class="flex items-center justify-between mb-6">
-                <h2 id="modalTitle" class="text-xl font-extrabold text-white">Log Transaction</h2>
-                <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
+                <h2 id="modalTitle" class="text-xl font-extrabold text-slate-900">Log Transaction</h2>
+                <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
             </div>
 
             <form id="transactionForm" class="space-y-4">
                 <input type="hidden" id="txId">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Type</label>
-                        <select id="txType" onchange="handleTypeChange()" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 text-sm">
-                            <option value="Expense" class="bg-slate-900 text-rose-400">Expense</option>
-                            <option value="Income" class="bg-slate-900 text-emerald-400">Income</option>
-                            <option value="Transfer" class="bg-slate-900 text-blue-400">Internal Transfer</option>
-                            <option value="Balance Correction" class="bg-slate-900 text-amber-400">Correction</option>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Type</label>
+                        <select id="txType" onchange="handleTypeChange()" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:border-emerald-500 text-sm">
+                            <option value="Expense">Expense</option><option value="Income">Income</option>
+                            <option value="Transfer">Internal Transfer</option><option value="Balance Correction">Correction</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Date</label>
-                        <input type="date" id="txDate" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 text-sm">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Date</label>
+                        <input type="date" id="txDate" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:border-emerald-500 text-sm">
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Amount (INR)</label>
-                    <input type="number" step="any" id="txAmount" required placeholder="0.00" class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl outline-none font-black text-2xl text-white focus:border-blue-500 transition-colors">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Amount (INR)</label>
+                    <input type="number" step="any" id="txAmount" required placeholder="0.00" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl font-black text-2xl text-slate-900 focus:border-emerald-500">
                 </div>
-
                 <div id="categoryContainer">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Category</label>
-                    <select id="txCategorySelect" onchange="handleCategoryChange()" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 mb-2"></select>
-                    <input type="text" id="txCategoryCustom" placeholder="Type custom category..." class="hidden w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Category</label>
+                    <select id="txCategorySelect" onchange="handleCategoryChange()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800 mb-2"></select>
+                    <input type="text" id="txCategoryCustom" placeholder="Custom category..." class="hidden w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800">
                 </div>
-
                 <div id="walletSection">
-                    <label id="walletLabel" class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Wallet Account</label>
-                    <select id="txWallet" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
-                        <option value="Cash" class="bg-slate-900">Cash</option>
-                        <option value="UPI" class="bg-slate-900">UPI / Digital</option>
-                        <option value="Bank" class="bg-slate-900">Bank Account</option>
-                        <option value="Card" class="bg-slate-900">Cards</option>
+                    <label id="walletLabel" class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Wallet Account</label>
+                    <select id="txWallet" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800">
+                        <option value="Cash">Cash</option><option value="UPI">UPI / Digital</option>
+                        <option value="Bank">Bank Account</option><option value="Card">Cards</option>
                     </select>
                 </div>
-
                 <div id="transferToSection" class="hidden">
-                    <label class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1.5">Transfer TO Wallet</label>
-                    <select id="txWalletTo" class="w-full px-4 py-3.5 bg-white/5 border border-blue-500/30 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
-                        <option value="Cash" class="bg-slate-900">Cash</option>
-                        <option value="UPI" class="bg-slate-900">UPI / Digital</option>
-                        <option value="Bank" class="bg-slate-900">Bank Account</option>
-                        <option value="Card" class="bg-slate-900">Cards</option>
+                    <label class="block text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1.5">Transfer TO Wallet</label>
+                    <select id="txWalletTo" class="w-full px-4 py-3.5 bg-blue-50 border border-blue-200 rounded-xl font-semibold text-blue-900">
+                        <option value="Cash">Cash</option><option value="UPI">UPI / Digital</option>
+                        <option value="Bank">Bank Account</option><option value="Card">Cards</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Notes (Optional)</label>
-                    <input type="text" id="txNotes" placeholder="Details..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none text-sm text-white focus:border-blue-500">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Notes</label>
+                    <input type="text" id="txNotes" placeholder="Details..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800">
                 </div>
-
-                <div class="flex gap-3 pt-2">
-                    <button type="button" id="deleteBtn" onclick="deleteTransaction()" class="hidden w-1/3 py-4 bg-rose-600/20 text-rose-500 border border-rose-500/30 font-bold rounded-xl active:scale-95"><iconify-icon icon="solar:trash-bin-trash-linear" class="text-xl"></iconify-icon></button>
-                    <button type="submit" id="saveTxBtn" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg active:scale-95 flex items-center justify-center gap-2 transition-all">Save <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon></button>
+                <div class="flex gap-3 pt-2 pb-4">
+                    <button type="button" id="deleteBtn" onclick="deleteTransaction()" class="hidden w-1/3 py-4 bg-rose-50 text-rose-600 font-bold rounded-xl active:scale-95"><iconify-icon icon="solar:trash-bin-trash-linear" class="text-xl"></iconify-icon></button>
+                    <button type="submit" id="saveTxBtn" class="flex-1 py-4 bg-slate-900 text-white font-bold rounded-xl shadow-lg active:scale-95 flex items-center justify-center gap-2">Save <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon></button>
                 </div>
             </form>
         </div>
@@ -183,131 +173,127 @@
     <script src="js/config.js"></script>
     <script>
         if (!localStorage.getItem('token')) window.location.href = 'login.html';
-        document.getElementById('txDate').valueAsDate = new Date();
         let globalTxData = [];
+        let isPrivacyMode = false;
+        const MONTHLY_BUDGET_LIMIT = 25000;
+
+        function togglePrivacy() {
+            isPrivacyMode = !isPrivacyMode;
+            document.getElementById('privacyIcon').setAttribute('icon', isPrivacyMode ? 'solar:eye-closed-linear' : 'solar:eye-linear');
+            updateUI(); // Instant update
+        }
+
+        function fmtMoney(amount) {
+            return isPrivacyMode ? '₹ •••••' : `₹${parseFloat(amount).toLocaleString('en-IN')}`;
+        }
 
         const categories = {
             Expense: ['Food & Dining', 'Transport', 'Rent', 'Utilities & Bills', 'Shopping', 'Entertainment', 'Health', 'Other'],
             Income: ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Refund', 'Other'],
-            Transfer: ['Internal Transfer'],
-            "Balance Correction": ['Adjustment']
+            Transfer: ['Internal Transfer'], "Balance Correction": ['Adjustment']
         };
 
         function handleTypeChange() {
             const type = document.getElementById('txType').value;
-            const select = document.getElementById('txCategorySelect');
-            const transferTo = document.getElementById('transferToSection');
-            const walletLabel = document.getElementById('walletLabel');
-            
-            select.innerHTML = categories[type].map(c => `<option value="${c}" class="bg-slate-900">${c}</option>`).join('');
+            document.getElementById('txCategorySelect').innerHTML = categories[type].map(c => `<option value="${c}">${c}</option>`).join('');
             handleCategoryChange();
-
             if (type === 'Transfer') {
                 document.getElementById('categoryContainer').classList.add('hidden');
-                transferTo.classList.remove('hidden'); walletLabel.innerText = "Transfer FROM";
+                document.getElementById('transferToSection').classList.remove('hidden'); 
+                document.getElementById('walletLabel').innerText = "Transfer FROM";
             } else {
                 document.getElementById('categoryContainer').classList.remove('hidden');
-                transferTo.classList.add('hidden'); walletLabel.innerText = "Wallet Account";
+                document.getElementById('transferToSection').classList.add('hidden'); 
+                document.getElementById('walletLabel').innerText = "Wallet Account";
             }
         }
-
         function handleCategoryChange() {
-            const val = document.getElementById('txCategorySelect').value;
-            const custom = document.getElementById('txCategoryCustom');
-            if(val === 'Other') { custom.classList.remove('hidden'); custom.required = true; } 
-            else { custom.classList.add('hidden'); custom.required = false; custom.value = ''; }
+            const val = document.getElementById('txCategorySelect').value; const custom = document.getElementById('txCategoryCustom');
+            if(val === 'Other') { custom.classList.remove('hidden'); custom.required = true; } else { custom.classList.add('hidden'); custom.required = false; custom.value = ''; }
         }
 
         function openModal(txId = null) {
             const modal = document.getElementById('txModal');
-            document.getElementById('transactionForm').reset();
-            document.getElementById('txDate').valueAsDate = new Date();
-            handleTypeChange();
-
+            document.getElementById('transactionForm').reset(); document.getElementById('txDate').valueAsDate = new Date(); handleTypeChange();
             if (txId) {
-                document.getElementById('modalTitle').innerText = "Edit Transaction";
-                document.getElementById('deleteBtn').classList.remove('hidden');
+                document.getElementById('modalTitle').innerText = "Edit Transaction"; document.getElementById('deleteBtn').classList.remove('hidden');
                 const tx = globalTxData.find(t => t.id === txId);
-                document.getElementById('txId').value = tx.id;
-                document.getElementById('txAmount').value = Math.abs(tx.amount);
-                document.getElementById('txType').value = tx.type;
+                document.getElementById('txId').value = tx.id; document.getElementById('txAmount').value = Math.abs(tx.amount); document.getElementById('txType').value = tx.type;
                 handleTypeChange();
-                
                 const catSelect = document.getElementById('txCategorySelect');
-                if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } 
-                else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
-                
-                document.getElementById('txWallet').value = tx.wallet;
-                document.getElementById('txDate').value = tx.date.split('T')[0];
-                document.getElementById('txNotes').value = tx.notes || '';
+                if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
+                document.getElementById('txWallet').value = tx.wallet; document.getElementById('txDate').value = tx.date.split('T')[0]; document.getElementById('txNotes').value = tx.notes || '';
                 if(tx.type === 'Transfer') document.getElementById('transferToSection').classList.add('hidden');
             } else {
-                document.getElementById('modalTitle').innerText = "Log Transaction";
-                document.getElementById('deleteBtn').classList.add('hidden');
-                document.getElementById('txId').value = '';
+                document.getElementById('modalTitle').innerText = "Log Transaction"; document.getElementById('deleteBtn').classList.add('hidden'); document.getElementById('txId').value = '';
             }
             modal.classList.remove('pointer-events-none', 'opacity-0'); modal.classList.add('modal-active', 'opacity-100');
         }
-
-        function closeModal() {
-            document.getElementById('txModal').classList.remove('modal-active', 'opacity-100');
-            document.getElementById('txModal').classList.add('pointer-events-none', 'opacity-0');
-        }
+        function closeModal() { document.getElementById('txModal').classList.remove('modal-active', 'opacity-100'); document.getElementById('txModal').classList.add('pointer-events-none', 'opacity-0'); }
 
         async function fetchDashboard() {
             try {
                 const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
                 if (!res.ok) throw new Error(); globalTxData = await res.json();
-                
-                let net = 0, inc = 0, exp = 0;
-                let w = { Cash: 0, UPI: 0, Bank: 0, Card: 0 };
-
-                globalTxData.forEach(tx => {
-                    const amt = parseFloat(tx.amount);
-                    if (tx.type === 'Income') { inc += amt; net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; } 
-                    else if (tx.type === 'Expense') { exp += amt; net -= amt; if(w[tx.wallet]!==undefined) w[tx.wallet] -= amt; }
-                    else if (tx.type === 'Balance Correction') { net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
-                    else if (tx.type === 'Transfer') { if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
-                });
-
-                document.getElementById('totalBalance').innerText = `\u20B9${net.toLocaleString('en-IN')}`;
-                document.getElementById('totalIn').innerText = `\u20B9${inc.toLocaleString('en-IN')}`;
-                document.getElementById('totalOut').innerText = `\u20B9${exp.toLocaleString('en-IN')}`;
-                document.getElementById('walletCash').innerText = `\u20B9${w.Cash.toLocaleString('en-IN')}`;
-                document.getElementById('walletUPI').innerText = `\u20B9${w.UPI.toLocaleString('en-IN')}`;
-                document.getElementById('walletBank').innerText = `\u20B9${w.Bank.toLocaleString('en-IN')}`;
-                document.getElementById('walletCard').innerText = `\u20B9${w.Card.toLocaleString('en-IN')}`;
-
-                renderFeed(globalTxData.slice(0, 15));
+                updateUI();
             } catch (err) { localStorage.clear(); window.location.href = 'login.html'; }
+        }
+
+        function updateUI() {
+            let net = 0, inc = 0, exp = 0, currentMonthExp = 0;
+            let w = { Cash: 0, UPI: 0, Bank: 0, Card: 0 };
+            const currMonth = new Date().getMonth();
+
+            globalTxData.forEach(tx => {
+                const amt = parseFloat(tx.amount);
+                if (tx.type === 'Income') { inc += amt; net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; } 
+                else if (tx.type === 'Expense') { 
+                    exp += amt; net -= amt; if(w[tx.wallet]!==undefined) w[tx.wallet] -= amt; 
+                    if(new Date(tx.date).getMonth() === currMonth) currentMonthExp += amt;
+                }
+                else if (tx.type === 'Balance Correction') { net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
+                else if (tx.type === 'Transfer') { if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
+            });
+
+            // Budget Update
+            const budgetPct = Math.min((currentMonthExp / MONTHLY_BUDGET_LIMIT) * 100, 100);
+            const budgetBar = document.getElementById('budgetBar');
+            budgetBar.style.width = `${budgetPct}%`;
+            budgetBar.className = budgetPct > 85 ? 'h-full bg-rose-500 rounded-full transition-all duration-500' : 'h-full bg-emerald-500 rounded-full transition-all duration-500';
+            document.getElementById('budgetStatus').innerText = `₹${currentMonthExp.toLocaleString('en-IN')} / ₹${MONTHLY_BUDGET_LIMIT.toLocaleString('en-IN')} (${Math.round(budgetPct)}%)`;
+
+            // Balance Updates
+            document.getElementById('totalBalance').innerText = fmtMoney(net);
+            document.getElementById('totalIn').innerText = fmtMoney(inc); document.getElementById('totalOut').innerText = fmtMoney(exp);
+            document.getElementById('walletCash').innerText = fmtMoney(w.Cash); document.getElementById('walletUPI').innerText = fmtMoney(w.UPI);
+            document.getElementById('walletBank').innerText = fmtMoney(w.Bank); document.getElementById('walletCard').innerText = fmtMoney(w.Card);
+
+            renderFeed(globalTxData.slice(0, 15));
         }
 
         function renderFeed(data) {
             const container = document.getElementById('transactionContainer');
-            if (data.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm"><iconify-icon icon="solar:box-minimalistic-broken" class="text-3xl block mx-auto opacity-50 mb-1"></iconify-icon>No transactions yet</div>`; return; }
+            if (data.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No transactions yet</div>`; return; }
 
             container.innerHTML = data.map(tx => {
-                let color = 'text-slate-400', sign = '', icon = 'solar:refresh-linear', border = 'border-l-slate-500';
-                if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) { color = 'text-emerald-400'; sign = '+'; icon = 'solar:arrow-left-down-bold'; border = 'border-l-emerald-500'; } 
-                else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) { color = 'text-rose-400'; sign = ''; icon = 'solar:arrow-right-up-bold'; border = 'border-l-rose-500'; }
+                let color = 'text-slate-500', sign = '', icon = 'solar:refresh-linear', bg = 'bg-slate-100';
+                if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) { color = 'text-emerald-600'; sign = '+'; icon = 'solar:arrow-left-down-bold'; bg = 'bg-emerald-50 text-emerald-600'; } 
+                else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) { color = 'text-slate-900'; sign = ''; icon = 'solar:arrow-right-up-bold'; bg = 'bg-rose-50 text-rose-500'; }
                 const dateObj = new Date(tx.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 
-                return `<div onclick="openModal('${tx.id}')" class="premium-card rounded-2xl p-4 flex items-center justify-between border-l-4 ${border}">
-                        <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 text-slate-300"><iconify-icon icon="${icon}" class="text-lg"></iconify-icon></div>
-                        <div><p class="text-sm font-bold text-slate-100">${tx.category}</p><p class="text-[10px] font-semibold text-slate-400">${dateObj} &bull; ${tx.wallet}</p></div></div>
-                        <p class="text-sm font-black ${color}">${sign}\u20B9${parseFloat(Math.abs(tx.amount)).toLocaleString('en-IN')}</p></div>`;
+                return `<div onclick="openModal('${tx.id}')" class="premium-card rounded-2xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center ${bg}"><iconify-icon icon="${icon}" class="text-lg"></iconify-icon></div>
+                        <div><p class="text-sm font-bold text-slate-800">${tx.category}</p><p class="text-[10px] font-semibold text-slate-500">${dateObj} &bull; ${tx.wallet}</p></div></div>
+                        <p class="text-sm font-black ${color}">${sign}${fmtMoney(Math.abs(tx.amount))}</p></div>`;
             }).join('');
         }
 
         document.getElementById('transactionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('saveTxBtn'); btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
+            e.preventDefault(); const btn = document.getElementById('saveTxBtn'); btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
             const id = document.getElementById('txId').value; const type = document.getElementById('txType').value;
             let cat = document.getElementById('txCategorySelect').value; if (cat === 'Other') cat = document.getElementById('txCategoryCustom').value;
             const rawAmount = parseFloat(document.getElementById('txAmount').value);
-            
             const payload = { type: type, amount: rawAmount, category: cat, wallet: document.getElementById('txWallet').value, date: document.getElementById('txDate').value, notes: document.getElementById('txNotes').value };
-
             try {
                 if (type === 'Transfer' && !id) {
                     const walletTo = document.getElementById('txWalletTo').value;
@@ -315,8 +301,7 @@
                     await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: -rawAmount, category: 'Internal Transfer'}) });
                     await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: rawAmount, wallet: walletTo, category: 'Internal Transfer'}) });
                 } else {
-                    const url = id ? `${API_BASE_URL}/transactions/${id}` : `${API_BASE_URL}/transactions`;
-                    const method = id ? 'PUT' : 'POST';
+                    const url = id ? `${API_BASE_URL}/transactions/${id}` : `${API_BASE_URL}/transactions`; const method = id ? 'PUT' : 'POST';
                     if(type === 'Balance Correction' && document.getElementById('txAmount').value < 0) payload.amount = rawAmount; 
                     await fetch(url, { method, headers: getAuthHeaders(), body: JSON.stringify(payload) });
                 }
@@ -326,11 +311,9 @@
         });
 
         async function deleteTransaction() {
-            if(!confirm("Delete this transaction permanently?")) return;
-            const id = document.getElementById('txId').value;
-            document.getElementById('deleteBtn').innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
-            await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-            closeModal(); fetchDashboard();
+            if(!confirm("Delete this transaction?")) return;
+            const id = document.getElementById('txId').value; document.getElementById('deleteBtn').innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
+            await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() }); closeModal(); fetchDashboard();
         }
         
         window.onload = () => { handleTypeChange(); fetchDashboard(); };
