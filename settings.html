@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Money Journal - Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
+        .premium-blur { backdrop-filter: blur(20px); background: rgba(17, 24, 39, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); }
+        .premium-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="pb-28 antialiased min-h-screen">
+
+    <nav class="sticky top-0 z-40 premium-blur px-6 py-4 border-b border-white/5">
+        <h1 class="text-lg font-extrabold tracking-tight text-white">Settings</h1>
+        <p class="text-[10px] font-semibold text-slate-400">App preferences & data</p>
+    </nav>
+
+    <main class="max-w-md mx-auto px-4 pt-6 space-y-4">
+        
+        <div class="premium-card rounded-2xl p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center"><iconify-icon icon="solar:user-bold" class="text-xl"></iconify-icon></div>
+                <div><p class="text-sm font-bold text-white">My Account</p><p class="text-[10px] text-slate-400">Secured via JWT</p></div>
+            </div>
+        </div>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-1">Data Management</h3>
+        
+        <button onclick="downloadCSV()" class="w-full premium-card rounded-2xl p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><iconify-icon icon="solar:document-add-linear" class="text-xl"></iconify-icon></div>
+                <div class="text-left"><p class="text-sm font-bold text-white">Export to CSV</p><p class="text-[10px] text-slate-400">Download for Excel</p></div>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="text-slate-500"></iconify-icon>
+        </button>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-1">Danger Zone</h3>
+
+        <button onclick="logout()" class="w-full premium-card rounded-2xl p-4 flex items-center justify-between border-rose-500/30">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center"><iconify-icon icon="solar:logout-3-broken" class="text-xl"></iconify-icon></div>
+                <div class="text-left"><p class="text-sm font-bold text-rose-400">Log Out</p><p class="text-[10px] text-slate-400">End secure session</p></div>
+            </div>
+        </button>
+    </main>
+
+    <nav class="fixed bottom-0 inset-x-0 z-40 premium-blur border-t border-white/5 px-6 py-3 flex items-center justify-around max-w-md mx-auto rounded-t-3xl">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300"><iconify-icon icon="solar:home-smile-angle-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Home</span></a>
+        <a href="history.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300"><iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">History</span></a>
+        <a href="analytics.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300"><iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Analysis</span></a>
+        <a href="settings.html" class="flex flex-col items-center gap-1 text-blue-400"><iconify-icon icon="solar:settings-bold" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Settings</span></a>
+    </nav>
+
+    <script src="js/config.js"></script>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = 'login.html';
+
+        async function downloadCSV() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error();
+                const txData = await res.json();
+                
+                if(txData.length === 0) return alert("No data to export.");
+
+                let csv = 'Date,Type,Category,Wallet,Amount,Notes\n';
+                txData.forEach(row => {
+                    csv += `"${new Date(row.date).toISOString().split('T')[0]}","${row.type}","${row.category}","${row.wallet}","${row.amount}","${row.notes || ''}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('href', url);
+                a.setAttribute('download', 'MoneyJournal_Export.csv');
+                a.click();
+            } catch (err) { alert('Export failed'); }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    </script>
+</body>
+</html>
+
