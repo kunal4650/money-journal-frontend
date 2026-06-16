@@ -15,7 +15,9 @@
 <body class="antialiased min-h-screen pb-10">
 
     <nav class="sticky top-0 z-40 glass-header px-4 py-4 flex items-center gap-4">
-        <button onclick="window.history.back()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors"><iconify-icon icon="solar:arrow-left-linear" class="text-xl"></iconify-icon></button>
+        <a href="javascript:history.back()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors">
+            <iconify-icon icon="solar:arrow-left-linear" class="text-xl"></iconify-icon>
+        </a>
         <div>
             <h1 class="text-lg font-extrabold tracking-tight text-slate-900">Terms of Service</h1>
             <p class="text-[10px] font-semibold text-slate-500">Last updated: Today</p>
@@ -38,10 +40,12 @@
             <p>You agree to safeguard your password and security answers. You are responsible for any activity that occurs under your account. We are not liable for any loss or damage arising from your failure to protect your credentials.</p>
         </section>
 
-        <section>
-            <h2 class="text-slate-900 font-bold mb-2">4. Termination</h2>
-            <p>We reserve the right to suspend or terminate accounts that violate these terms, attempt to hack or disrupt the service, or engage in malicious activity.</p>
-        </section>
+        <!-- The "Done" Button -->
+        <div class="mt-10 pt-6 border-t border-slate-200">
+            <a href="javascript:history.back()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-500 transition-all active:scale-95 flex justify-center items-center gap-2">
+                Done / Go Back <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon>
+            </a>
+        </div>
     </main>
 </body>
 </html>
