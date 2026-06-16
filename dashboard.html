@@ -34,9 +34,6 @@
                 <p class="text-[10px] font-semibold text-emerald-400 mt-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Syncing Live</p>
             </div>
         </div>
-        <button onclick="logout()" class="h-9 w-9 rounded-xl hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors">
-            <iconify-icon icon="solar:logout-3-broken" class="text-xl"></iconify-icon>
-        </button>
     </nav>
 
     <main class="max-w-md mx-auto px-4 pt-6 space-y-6">
@@ -95,12 +92,23 @@
         <iconify-icon icon="solar:add-circle-bold" class="text-2xl"></iconify-icon>
     </button>
 
+    <!-- NEW FULL NAVIGATION -->
     <nav class="fixed bottom-0 inset-x-0 z-40 premium-blur border-t border-white/5 px-6 py-3 flex items-center justify-around max-w-md mx-auto rounded-t-3xl">
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-blue-400"><iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Home</span></a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50"><iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">History</span></a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50"><iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Analysis</span></a>
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-blue-400">
+            <iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="history.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
+            <iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">History</span>
+        </a>
+        <a href="analytics.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
+            <iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Analysis</span>
+        </a>
+        <a href="settings.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300">
+            <iconify-icon icon="solar:settings-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Settings</span>
+        </a>
     </nav>
 
+    <!-- Unified Modal for Add / Edit / Transfer -->
     <div id="txModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="w-full max-w-md bg-slate-900 border-t border-white/10 rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
             <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
@@ -111,7 +119,8 @@
             </div>
 
             <form id="transactionForm" class="space-y-4">
-                <input type="hidden" id="txId"> <div class="grid grid-cols-2 gap-3">
+                <input type="hidden" id="txId">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Type</label>
                         <select id="txType" onchange="handleTypeChange()" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 text-sm">
@@ -134,8 +143,7 @@
 
                 <div id="categoryContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Category</label>
-                    <select id="txCategorySelect" onchange="handleCategoryChange()" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 mb-2">
-                        </select>
+                    <select id="txCategorySelect" onchange="handleCategoryChange()" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 mb-2"></select>
                     <input type="text" id="txCategoryCustom" placeholder="Type custom category..." class="hidden w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
                 </div>
 
@@ -165,12 +173,8 @@
                 </div>
 
                 <div class="flex gap-3 pt-2">
-                    <button type="button" id="deleteBtn" onclick="deleteTransaction()" class="hidden w-1/3 py-4 bg-rose-600/20 text-rose-500 border border-rose-500/30 font-bold rounded-xl active:scale-95">
-                        <iconify-icon icon="solar:trash-bin-trash-linear" class="text-xl"></iconify-icon>
-                    </button>
-                    <button type="submit" id="saveTxBtn" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg active:scale-95 flex items-center justify-center gap-2 transition-all">
-                        Save <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon>
-                    </button>
+                    <button type="button" id="deleteBtn" onclick="deleteTransaction()" class="hidden w-1/3 py-4 bg-rose-600/20 text-rose-500 border border-rose-500/30 font-bold rounded-xl active:scale-95"><iconify-icon icon="solar:trash-bin-trash-linear" class="text-xl"></iconify-icon></button>
+                    <button type="submit" id="saveTxBtn" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg active:scale-95 flex items-center justify-center gap-2 transition-all">Save <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon></button>
                 </div>
             </form>
         </div>
@@ -179,13 +183,9 @@
     <script src="js/config.js"></script>
     <script>
         if (!localStorage.getItem('token')) window.location.href = 'login.html';
-        
-        // Setup Date Default
         document.getElementById('txDate').valueAsDate = new Date();
-        
         let globalTxData = [];
 
-        // Category Logic
         const categories = {
             Expense: ['Food & Dining', 'Transport', 'Rent', 'Utilities & Bills', 'Shopping', 'Entertainment', 'Health', 'Other'],
             Income: ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Refund', 'Other'],
@@ -196,99 +196,68 @@
         function handleTypeChange() {
             const type = document.getElementById('txType').value;
             const select = document.getElementById('txCategorySelect');
-            const customInput = document.getElementById('txCategoryCustom');
             const transferTo = document.getElementById('transferToSection');
             const walletLabel = document.getElementById('walletLabel');
             
-            // Handle Dropdowns
             select.innerHTML = categories[type].map(c => `<option value="${c}" class="bg-slate-900">${c}</option>`).join('');
-            
-            // Handle Custom Input
             handleCategoryChange();
 
-            // Handle Transfer Logic (Hide categories, show "To" wallet)
             if (type === 'Transfer') {
                 document.getElementById('categoryContainer').classList.add('hidden');
-                transferTo.classList.remove('hidden');
-                walletLabel.innerText = "Transfer FROM Wallet";
+                transferTo.classList.remove('hidden'); walletLabel.innerText = "Transfer FROM";
             } else {
                 document.getElementById('categoryContainer').classList.remove('hidden');
-                transferTo.classList.add('hidden');
-                walletLabel.innerText = "Wallet Account";
+                transferTo.classList.add('hidden'); walletLabel.innerText = "Wallet Account";
             }
         }
 
         function handleCategoryChange() {
             const val = document.getElementById('txCategorySelect').value;
             const custom = document.getElementById('txCategoryCustom');
-            if(val === 'Other') {
-                custom.classList.remove('hidden'); custom.required = true;
-            } else {
-                custom.classList.add('hidden'); custom.required = false; custom.value = '';
-            }
+            if(val === 'Other') { custom.classList.remove('hidden'); custom.required = true; } 
+            else { custom.classList.add('hidden'); custom.required = false; custom.value = ''; }
         }
 
         function openModal(txId = null) {
             const modal = document.getElementById('txModal');
-            const form = document.getElementById('transactionForm');
-            const delBtn = document.getElementById('deleteBtn');
-            const title = document.getElementById('modalTitle');
-            
-            form.reset();
+            document.getElementById('transactionForm').reset();
             document.getElementById('txDate').valueAsDate = new Date();
             handleTypeChange();
 
             if (txId) {
-                // Editing existing
-                title.innerText = "Edit Transaction";
-                delBtn.classList.remove('hidden');
-                
+                document.getElementById('modalTitle').innerText = "Edit Transaction";
+                document.getElementById('deleteBtn').classList.remove('hidden');
                 const tx = globalTxData.find(t => t.id === txId);
                 document.getElementById('txId').value = tx.id;
-                document.getElementById('txAmount').value = tx.amount;
+                document.getElementById('txAmount').value = Math.abs(tx.amount);
                 document.getElementById('txType').value = tx.type;
-                handleTypeChange(); // Re-populate dropdowns
+                handleTypeChange();
                 
-                // Set category
                 const catSelect = document.getElementById('txCategorySelect');
-                if (categories[tx.type].includes(tx.category)) {
-                    catSelect.value = tx.category;
-                } else {
-                    catSelect.value = 'Other';
-                    document.getElementById('txCategoryCustom').classList.remove('hidden');
-                    document.getElementById('txCategoryCustom').value = tx.category;
-                }
+                if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } 
+                else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
                 
                 document.getElementById('txWallet').value = tx.wallet;
                 document.getElementById('txDate').value = tx.date.split('T')[0];
                 document.getElementById('txNotes').value = tx.notes || '';
-                
-                // Transfers can't be strictly edited back into dual-wallets easily, so we lock the "To" wallet and just edit the raw DB entry.
                 if(tx.type === 'Transfer') document.getElementById('transferToSection').classList.add('hidden');
-
             } else {
-                // New
-                title.innerText = "Log Transaction";
-                delBtn.classList.add('hidden');
+                document.getElementById('modalTitle').innerText = "Log Transaction";
+                document.getElementById('deleteBtn').classList.add('hidden');
                 document.getElementById('txId').value = '';
             }
-
-            modal.classList.remove('pointer-events-none', 'opacity-0');
-            modal.classList.add('modal-active', 'opacity-100');
+            modal.classList.remove('pointer-events-none', 'opacity-0'); modal.classList.add('modal-active', 'opacity-100');
         }
 
         function closeModal() {
-            const modal = document.getElementById('txModal');
-            modal.classList.remove('modal-active', 'opacity-100');
-            modal.classList.add('pointer-events-none', 'opacity-0');
+            document.getElementById('txModal').classList.remove('modal-active', 'opacity-100');
+            document.getElementById('txModal').classList.add('pointer-events-none', 'opacity-0');
         }
 
         async function fetchDashboard() {
             try {
                 const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
-                if (!res.ok) throw new Error('Auth failed');
-                
-                globalTxData = await res.json();
+                if (!res.ok) throw new Error(); globalTxData = await res.json();
                 
                 let net = 0, inc = 0, exp = 0;
                 let w = { Cash: 0, UPI: 0, Bank: 0, Card: 0 };
@@ -297,15 +266,8 @@
                     const amt = parseFloat(tx.amount);
                     if (tx.type === 'Income') { inc += amt; net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; } 
                     else if (tx.type === 'Expense') { exp += amt; net -= amt; if(w[tx.wallet]!==undefined) w[tx.wallet] -= amt; }
-                    else if (tx.type === 'Balance Correction') {
-                        // Correction directly sets wallet value logic (Simplified: acts as absolute injection)
-                        net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt;
-                    }
-                    else if (tx.type === 'Transfer') {
-                        // Transfers are handled as two transactions in our save function. 
-                        // So here, a negative transfer means out, positive means in.
-                        if(w[tx.wallet]!==undefined) w[tx.wallet] += amt;
-                    }
+                    else if (tx.type === 'Balance Correction') { net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
+                    else if (tx.type === 'Transfer') { if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; }
                 });
 
                 document.getElementById('totalBalance').innerText = `\u20B9${net.toLocaleString('en-IN')}`;
@@ -317,84 +279,47 @@
                 document.getElementById('walletCard').innerText = `\u20B9${w.Card.toLocaleString('en-IN')}`;
 
                 renderFeed(globalTxData.slice(0, 15));
-            } catch (err) { logout(); }
+            } catch (err) { localStorage.clear(); window.location.href = 'login.html'; }
         }
 
         function renderFeed(data) {
             const container = document.getElementById('transactionContainer');
-            if (data.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm"><iconify-icon icon="solar:box-minimalistic-broken" class="text-3xl block mx-auto opacity-50 mb-1"></iconify-icon>No transactions yet</div>`;
-                return;
-            }
+            if (data.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm"><iconify-icon icon="solar:box-minimalistic-broken" class="text-3xl block mx-auto opacity-50 mb-1"></iconify-icon>No transactions yet</div>`; return; }
 
             container.innerHTML = data.map(tx => {
                 let color = 'text-slate-400', sign = '', icon = 'solar:refresh-linear', border = 'border-l-slate-500';
-                if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) {
-                    color = 'text-emerald-400'; sign = '+'; icon = 'solar:arrow-left-down-bold'; border = 'border-l-emerald-500';
-                } else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) {
-                    color = 'text-rose-400'; sign = ''; icon = 'solar:arrow-right-up-bold'; border = 'border-l-rose-500';
-                }
+                if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) { color = 'text-emerald-400'; sign = '+'; icon = 'solar:arrow-left-down-bold'; border = 'border-l-emerald-500'; } 
+                else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) { color = 'text-rose-400'; sign = ''; icon = 'solar:arrow-right-up-bold'; border = 'border-l-rose-500'; }
                 const dateObj = new Date(tx.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 
-                return `
-                    <div onclick="openModal('${tx.id}')" class="premium-card rounded-2xl p-4 flex items-center justify-between border-l-4 ${border}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 text-slate-300">
-                                <iconify-icon icon="${icon}" class="text-lg"></iconify-icon>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-slate-100">${tx.category}</p>
-                                <p class="text-[10px] font-semibold text-slate-400">${dateObj} &bull; ${tx.wallet}</p>
-                            </div>
-                        </div>
-                        <p class="text-sm font-black ${color}">${sign}\u20B9${parseFloat(tx.amount).toLocaleString('en-IN')}</p>
-                    </div>`;
+                return `<div onclick="openModal('${tx.id}')" class="premium-card rounded-2xl p-4 flex items-center justify-between border-l-4 ${border}">
+                        <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 text-slate-300"><iconify-icon icon="${icon}" class="text-lg"></iconify-icon></div>
+                        <div><p class="text-sm font-bold text-slate-100">${tx.category}</p><p class="text-[10px] font-semibold text-slate-400">${dateObj} &bull; ${tx.wallet}</p></div></div>
+                        <p class="text-sm font-black ${color}">${sign}\u20B9${parseFloat(Math.abs(tx.amount)).toLocaleString('en-IN')}</p></div>`;
             }).join('');
         }
 
         document.getElementById('transactionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('saveTxBtn');
-            btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
-
-            const id = document.getElementById('txId').value;
-            const type = document.getElementById('txType').value;
-            let cat = document.getElementById('txCategorySelect').value;
-            if (cat === 'Other') cat = document.getElementById('txCategoryCustom').value;
-            
+            const btn = document.getElementById('saveTxBtn'); btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
+            const id = document.getElementById('txId').value; const type = document.getElementById('txType').value;
+            let cat = document.getElementById('txCategorySelect').value; if (cat === 'Other') cat = document.getElementById('txCategoryCustom').value;
             const rawAmount = parseFloat(document.getElementById('txAmount').value);
             
-            // Build Base Payload
-            const payload = {
-                type: type,
-                amount: rawAmount,
-                category: cat,
-                wallet: document.getElementById('txWallet').value,
-                date: document.getElementById('txDate').value,
-                notes: document.getElementById('txNotes').value
-            };
+            const payload = { type: type, amount: rawAmount, category: cat, wallet: document.getElementById('txWallet').value, date: document.getElementById('txDate').value, notes: document.getElementById('txNotes').value };
 
             try {
-                // Handle Transfer Special Logic (Creates 2 transactions)
                 if (type === 'Transfer' && !id) {
                     const walletTo = document.getElementById('txWalletTo').value;
                     if (payload.wallet === walletTo) throw new Error("Cannot transfer to same wallet");
-                    
-                    // Outgoing
                     await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: -rawAmount, category: 'Internal Transfer'}) });
-                    // Incoming
                     await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: rawAmount, wallet: walletTo, category: 'Internal Transfer'}) });
                 } else {
-                    // Standard Save / Update
                     const url = id ? `${API_BASE_URL}/transactions/${id}` : `${API_BASE_URL}/transactions`;
                     const method = id ? 'PUT' : 'POST';
-                    
-                    // If balance correction is negative, format it
                     if(type === 'Balance Correction' && document.getElementById('txAmount').value < 0) payload.amount = rawAmount; 
-
                     await fetch(url, { method, headers: getAuthHeaders(), body: JSON.stringify(payload) });
                 }
-
                 closeModal(); fetchDashboard();
             } catch (err) { alert(err.message || 'Error saving'); }
             finally { btn.innerHTML = 'Save <iconify-icon icon="solar:check-circle-linear"></iconify-icon>'; }
@@ -403,17 +328,12 @@
         async function deleteTransaction() {
             if(!confirm("Delete this transaction permanently?")) return;
             const id = document.getElementById('txId').value;
-            const btn = document.getElementById('deleteBtn');
-            btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
-            
+            document.getElementById('deleteBtn').innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
             await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
             closeModal(); fetchDashboard();
         }
-
-        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
         
         window.onload = () => { handleTypeChange(); fetchDashboard(); };
     </script>
 </body>
 </html>
-
