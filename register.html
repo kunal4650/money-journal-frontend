@@ -13,7 +13,6 @@
     </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
-    <!-- Decorative background glow -->
     <div class="absolute top-[-10%] left-[-10%] w-72 h-72 bg-emerald-400/20 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-blue-400/20 rounded-full blur-[100px] pointer-events-none"></div>
     
@@ -53,11 +52,11 @@
                 <input type="text" id="securityAnswer" required placeholder="Keep this safe!" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-800 focus:border-emerald-500 focus:bg-white transition-colors">
             </div>
 
-            <!-- Legal Checkbox -->
+            <!-- FIXED LEGAL CHECKBOX (Removed target="_blank") -->
             <div class="flex items-start gap-2 pt-2">
                 <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 rounded text-emerald-600 border-slate-300 focus:ring-emerald-500">
                 <label for="terms" class="text-xs text-slate-500 font-medium leading-tight">
-                    I agree to the <a href="terms.html" class="text-emerald-600 font-bold hover:underline" target="_blank">Terms & Conditions</a> and Privacy Policy.
+                    I agree to the <a href="terms.html" class="text-emerald-600 font-bold hover:underline">Terms & Conditions</a> and Privacy Policy.
                 </label>
             </div>
 
@@ -73,42 +72,29 @@
     <script src="js/config.js"></script>
     <script>
         function togglePwd(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            if (input.type === "password") {
-                input.type = "text"; icon.setAttribute("icon", "solar:eye-closed-linear");
-            } else {
-                input.type = "password"; icon.setAttribute("icon", "solar:eye-linear");
-            }
+            const input = document.getElementById(inputId); const icon = document.getElementById(iconId);
+            if (input.type === "password") { input.type = "text"; icon.setAttribute("icon", "solar:eye-closed-linear"); } 
+            else { input.type = "password"; icon.setAttribute("icon", "solar:eye-linear"); }
         }
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
+            const btn = document.getElementById('submitBtn'); btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
             
             const payload = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                securityQuestion: document.getElementById('securityQuestion').value,
+                name: document.getElementById('name').value, email: document.getElementById('email').value,
+                password: document.getElementById('password').value, securityQuestion: document.getElementById('securityQuestion').value,
                 securityAnswer: document.getElementById('securityAnswer').value
             };
 
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
+                const response = await fetch(`${API_BASE_URL}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('token', data.token); window.location.href = 'dashboard.html';
-                } else {
-                    alert(data.msg); btn.innerHTML = 'Create Account <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>';
-                }
-            } catch (err) {
-                alert('Connection error.'); btn.innerHTML = 'Create Account';
-            }
+                if (response.ok) { localStorage.setItem('token', data.token); window.location.href = 'dashboard.html'; } 
+                else { alert(data.msg); btn.innerHTML = 'Create Account <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>'; }
+            } catch (err) { alert('Connection error.'); btn.innerHTML = 'Create Account'; }
         });
     </script>
 </body>
 </html>
+
