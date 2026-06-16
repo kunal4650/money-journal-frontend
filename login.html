@@ -10,20 +10,16 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
         .bg-grid { background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 30px 30px; }
-        .premium-blur { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .premium-blur { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-    <!-- Animated background elements -->
     <div class="fixed inset-0 bg-grid pointer-events-none z-[-1]"></div>
     <div class="absolute top-[-10%] right-[-10%] w-72 h-72 bg-blue-600/30 rounded-full blur-[100px] pointer-events-none"></div>
     <div class="absolute bottom-[-10%] left-[-10%] w-72 h-72 bg-purple-600/20 rounded-full blur-[100px] pointer-events-none"></div>
     
-    <div class="w-full max-w-md premium-blur rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative z-10">
+    <div class="w-full max-w-md premium-blur rounded-[2.5rem] p-8 shadow-2xl relative z-10">
         <div class="text-center mb-8">
-            <div class="w-14 h-14 bg-blue-600/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
-                <iconify-icon icon="solar:lock-keyhole-minimalistic-bold-duotone" class="text-blue-400 text-3xl"></iconify-icon>
-            </div>
             <h1 class="text-2xl font-black tracking-tight text-white mb-1">Welcome Back</h1>
             <p class="text-xs font-semibold text-slate-400">Log in to your dashboard</p>
         </div>
@@ -33,52 +29,59 @@
                 <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address</label>
                 <input type="email" id="email" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 transition-colors">
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password</label>
-                <input type="password" id="password" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 transition-colors">
+            <div class="relative">
+                <div class="flex justify-between items-center mb-1.5">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
+                    <a href="forgot-password.html" class="text-[10px] font-bold text-blue-400 hover:text-blue-300">Forgot?</a>
+                </div>
+                <input type="password" id="password" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 transition-colors pr-12">
+                <button type="button" onclick="togglePwd('password', 'eyeIcon2')" class="absolute right-4 bottom-3 text-slate-400 hover:text-white">
+                    <iconify-icon id="eyeIcon2" icon="solar:eye-linear" class="text-xl"></iconify-icon>
+                </button>
             </div>
 
-            <button type="submit" class="w-full py-4 mt-2 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-500 transition-all transform active:scale-95 flex justify-center items-center gap-2" id="submitBtn">
+            <button type="submit" id="submitBtn" class="w-full py-4 mt-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-500 transition-all active:scale-95 flex justify-center items-center gap-2">
                 Log In <iconify-icon icon="solar:login-2-linear" class="text-lg"></iconify-icon>
             </button>
         </form>
-
         <div class="text-center mt-6">
-            <p class="text-xs font-semibold text-slate-400">New here? <a href="register.html" class="text-blue-400 font-bold hover:text-blue-300">Create Account</a></p>
+            <p class="text-xs font-semibold text-slate-400">New here? <a href="register.html" class="text-blue-400 font-bold">Create Account</a></p>
         </div>
     </div>
 
     <script src="js/config.js"></script>
     <script>
+        function togglePwd(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text"; icon.setAttribute("icon", "solar:eye-closed-linear");
+            } else {
+                input.type = "password"; icon.setAttribute("icon", "solar:eye-linear");
+            }
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
                 });
                 const data = await response.json();
                 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    window.location.href = 'dashboard.html';
+                    localStorage.setItem('token', data.token); window.location.href = 'dashboard.html';
                 } else {
-                    alert(data.msg || 'Invalid credentials');
-                    btn.innerHTML = 'Log In <iconify-icon icon="solar:login-2-linear" class="text-lg"></iconify-icon>';
+                    alert(data.msg); btn.innerHTML = 'Log In <iconify-icon icon="solar:login-2-linear"></iconify-icon>';
                 }
             } catch (err) {
-                alert('Connection error. Is your backend running?');
-                btn.innerHTML = 'Log In';
+                alert('Connection error.'); btn.innerHTML = 'Log In';
             }
         });
     </script>
 </body>
 </html>
-
