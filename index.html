@@ -1,14 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyExpenseJournal - Master Your Finances</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .glass-header { backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.85); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .feature-card { background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.03); transition: all 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: rgba(16, 185, 129, 0.2); }
+        /* Smooth FAQ animations */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
     <script>
-        if (localStorage.getItem('token')) {
-            window.location.href = 'dashboard.html';
-        } else {
-            window.location.href = 'login.html';
-        }
+        // Intelligent Routing: If they are already logged in, skip the landing page
+        if (localStorage.getItem('token')) { window.location.href = 'dashboard.html'; }
     </script>
 </head>
-<body>
+<body class="antialiased overflow-x-hidden selection:bg-emerald-200 selection:text-emerald-900">
+
+    <!-- Sticky Glass Header -->
+    <header class="fixed top-0 inset-x-0 z-50 glass-header">
+        <div class="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                    <iconify-icon icon="solar:wallet-money-bold-duotone" class="text-2xl"></iconify-icon>
+                </div>
+                <span class="text-lg font-extrabold tracking-tight text-slate-800">MyExpenseJournal</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="login.html" class="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors hidden sm:block">Log In</a>
+                <a href="register.html" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-full transition-all active:scale-95 shadow-md hover:shadow-lg">Get Started</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6 max-w-5xl mx-auto text-center relative">
+        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-400/20 rounded-full blur-[100px] -z-10"></div>
+        
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold uppercase tracking-wider mb-6 border border-emerald-100">
+            <iconify-icon icon="solar:shield-check-bold" class="text-sm"></iconify-icon> 100% Secure & Private
+        </span>
+        
+        <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
+            Track your wealth.<br>Master your <span class="text-emerald-600">financial future.</span>
+        </h1>
+        
+        <p class="text-base md:text-lg text-slate-500 max-w-2xl mx-auto mb-10 font-medium leading-relaxed">
+            Welcome to MyExpenseJournal. The simple, secure, and professional platform designed to help you track everyday expenses, monitor cash flow, and achieve financial clarity.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="register.html" class="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 text-lg">
+                Start Tracking Free <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+            </a>
+            <a href="login.html" class="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-2xl transition-all active:scale-95 shadow-sm border border-slate-200 flex items-center justify-center gap-2 text-lg">
+                Sign In to Account
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-6 bg-slate-50 border-t border-slate-200/50">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Everything you need, nothing you don't.</h2>
+                <p class="text-slate-500 font-medium max-w-lg mx-auto">Built for speed and clarity, so you can manage your money without the headache.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="feature-card rounded-3xl p-8">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon></div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Smart Analytics</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Visualize your spending habits with beautiful, easy-to-read charts that update in real-time as you log transactions.</p>
+                </div>
+                <div class="feature-card rounded-3xl p-8">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><iconify-icon icon="solar:safe-square-bold-duotone"></iconify-icon></div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Bank-Level Security</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Your data is secured using advanced JWT encryption. We never connect to your actual bank account, keeping you 100% protected.</p>
+                </div>
+                <div class="feature-card rounded-3xl p-8">
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><iconify-icon icon="solar:document-add-bold-duotone"></iconify-icon></div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Export Anytime</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Your data belongs to you. Download your complete financial history to CSV/Excel with a single click in your settings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-6 max-w-3xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-extrabold text-slate-900 mb-4">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="space-y-4">
+            <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                <summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-slate-800 active:bg-slate-50 transition-colors">
+                    Is MyExpenseJournal safe to use?
+                    <iconify-icon icon="solar:alt-arrow-down-linear" class="text-slate-400 group-open:-rotate-180 transition-transform duration-300"></iconify-icon>
+                </summary>
+                <div class="px-6 pb-6 text-sm text-slate-500 leading-relaxed">
+                    Yes. We take security seriously. We use hashed passwords and secure JWT tokens for authentication. Furthermore, we never ask for your real bank login details or credit card numbers. All data entry is manual and private.
+                </div>
+            </details>
+
+            <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                <summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-slate-800 active:bg-slate-50 transition-colors">
+                    Is this platform really free?
+                    <iconify-icon icon="solar:alt-arrow-down-linear" class="text-slate-400 group-open:-rotate-180 transition-transform duration-300"></iconify-icon>
+                </summary>
+                <div class="px-6 pb-6 text-sm text-slate-500 leading-relaxed">
+                    Yes! Tracking your personal finances shouldn't cost you money. The core features of MyExpenseJournal are completely free to use.
+                </div>
+            </details>
+
+            <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                <summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-slate-800 active:bg-slate-50 transition-colors">
+                    Can I delete my data if I want to leave?
+                    <iconify-icon icon="solar:alt-arrow-down-linear" class="text-slate-400 group-open:-rotate-180 transition-transform duration-300"></iconify-icon>
+                </summary>
+                <div class="px-6 pb-6 text-sm text-slate-500 leading-relaxed">
+                    Absolutely. You can delete any transaction instantly. You can also export all your data to Excel before leaving. We believe in complete user data ownership.
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- Professional Footer -->
+    <footer class="bg-slate-900 pt-16 pb-8 px-6 text-slate-400">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div>
+                <div class="flex items-center gap-2 mb-4 text-white">
+                    <iconify-icon icon="solar:wallet-money-bold-duotone" class="text-2xl text-emerald-400"></iconify-icon>
+                    <span class="text-lg font-extrabold tracking-tight">MyExpenseJournal</span>
+                </div>
+                <p class="text-sm text-slate-500 max-w-xs leading-relaxed">Empowering individuals to take control of their financial destiny through simple, secure tracking.</p>
+            </div>
+            
+            <div>
+                <h4 class="text-white font-bold mb-4">Platform</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="login.html" class="hover:text-emerald-400 transition-colors">Log In</a></li>
+                    <li><a href="register.html" class="hover:text-emerald-400 transition-colors">Create Account</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-4">Legal</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="privacy.html" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
+                    <li><a href="terms.html" class="hover:text-emerald-400 transition-colors">Terms of Service</a></li>
+                    <li><a href="disclaimer.html" class="hover:text-emerald-400 transition-colors">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="max-w-5xl mx-auto pt-8 border-t border-slate-800 text-xs text-center text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>&copy; 2026 MyExpenseJournal. All rights reserved.</p>
+            <p>Designed with security in mind.</p>
+        </div>
+    </footer>
+
 </body>
 </html>
