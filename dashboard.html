@@ -10,66 +10,57 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
         .premium-blur { backdrop-filter: blur(20px); background: rgba(17, 24, 39, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); }
-        .premium-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .premium-card:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5); }
+        .premium-card { background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%); border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s; }
+        .premium-card:active { transform: scale(0.98); }
         .modal-animate { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); transform: scale(0.9) translateY(20px); opacity: 0; }
         .modal-active .modal-animate { transform: scale(1) translateY(0); opacity: 1; }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
         input, select, button { -webkit-tap-highlight-color: transparent; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="pb-28 antialiased min-h-screen">
 
-    <!-- Top Sticky Navigation Bar -->
     <nav class="sticky top-0 z-40 premium-blur px-6 py-4 flex items-center justify-between border-b border-white/5">
         <div class="flex items-center gap-3">
             <div class="h-10 w-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10">
                 <iconify-icon icon="solar:wallet-money-bold-duotone" class="text-blue-400 text-2xl"></iconify-icon>
             </div>
             <div>
-                <h1 class="text-base font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Money Journal</h1>
-                <p class="text-[10px] font-semibold text-emerald-400 mt-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Connected</p>
+                <h1 class="text-base font-extrabold tracking-tight text-white">Money Journal</h1>
+                <p class="text-[10px] font-semibold text-emerald-400 mt-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Syncing Live</p>
             </div>
         </div>
-        <button onclick="logout()" class="h-9 w-9 rounded-xl hover:bg-white/5 flex items-center justify-center transition-colors text-slate-400 hover:text-rose-400">
+        <button onclick="logout()" class="h-9 w-9 rounded-xl hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors">
             <iconify-icon icon="solar:logout-3-broken" class="text-xl"></iconify-icon>
         </button>
     </nav>
 
     <main class="max-w-md mx-auto px-4 pt-6 space-y-6">
-
-        <!-- Master Balance Card -->
-        <div class="w-full rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 p-6 shadow-xl relative overflow-hidden group">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
-            <p class="text-xs font-bold text-white/70 uppercase tracking-widest">Total Net Balance</p>
-            <h2 id="totalBalance" class="text-3xl font-black text-white tracking-tight mt-1 transition-all duration-300">₹0.00</h2>
+        <div class="w-full rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+            <p class="text-xs font-bold text-white/70 uppercase tracking-widest">Total Net Worth</p>
+            <h2 id="totalBalance" class="text-3xl font-black text-white tracking-tight mt-1">₹0.00</h2>
             
             <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-300">
-                        <iconify-icon icon="solar:arrow-left-down-bold" class="text-base"></iconify-icon>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-white/60 uppercase">Money In</p>
-                        <p id="totalIn" class="text-sm font-bold text-emerald-300">₹0.00</p>
-                    </div>
+                <div>
+                    <p class="text-[10px] font-bold text-white/60 uppercase">Total Income</p>
+                    <p id="totalIn" class="text-sm font-bold text-emerald-300">₹0.00</p>
                 </div>
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-300">
-                        <iconify-icon icon="solar:arrow-right-up-bold" class="text-base"></iconify-icon>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-white/60 uppercase">Money Out</p>
-                        <p id="totalOut" class="text-sm font-bold text-rose-300">₹0.00</p>
-                    </div>
+                <div>
+                    <p class="text-[10px] font-bold text-white/60 uppercase">Total Expense</p>
+                    <p id="totalOut" class="text-sm font-bold text-rose-300">₹0.00</p>
                 </div>
             </div>
         </div>
 
-        <!-- Wallets Horizon -->
         <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-1">Wallets & Accounts</h3>
+            <div class="flex justify-between items-center mb-3 px-1">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Wallets & Accounts</h3>
+            </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400"><iconify-icon icon="solar:banknote-linear" class="text-xl"></iconify-icon></div>
@@ -77,97 +68,110 @@
                 </div>
                 <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400"><iconify-icon icon="solar:qr-code-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">UPI / Digital</p><p id="walletUPI" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                    <div><p class="text-[11px] font-semibold text-slate-400">UPI</p><p id="walletUPI" class="text-sm font-bold text-slate-200">₹0.00</p></div>
                 </div>
                 <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400"><iconify-icon icon="solar:bank-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">Bank Account</p><p id="walletBank" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                    <div><p class="text-[11px] font-semibold text-slate-400">Bank</p><p id="walletBank" class="text-sm font-bold text-slate-200">₹0.00</p></div>
                 </div>
                 <div class="premium-card rounded-2xl p-4 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400"><iconify-icon icon="solar:card-transfer-linear" class="text-xl"></iconify-icon></div>
-                    <div><p class="text-[11px] font-semibold text-slate-400">Cards</p><p id="walletCard" class="text-sm font-bold text-slate-200">₹0.00</p></div>
+                    <div><p class="text-[11px] font-semibold text-slate-400">Card</p><p id="walletCard" class="text-sm font-bold text-slate-200">₹0.00</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Ledger Activity Section -->
         <div>
-            <div class="flex justify-between items-center mb-3 px-1">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Recent Activity</h3>
-            </div>
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-1">Recent Activity</h3>
+            <p class="text-[10px] text-slate-500 px-1 mb-2">Tap any item to edit or delete</p>
             <div id="transactionContainer" class="space-y-2.5 max-h-[350px] overflow-y-auto custom-scroll pr-1">
-                <!-- Fallback Loading UI -->
-                <div class="text-center py-8 text-slate-500 font-medium text-sm">
-                    <iconify-icon icon="solar:spinner-linear" class="animate-spin text-3xl mb-1 block mx-auto opacity-50"></iconify-icon>
-                    Syncing data...
-                </div>
+                <div class="rounded-2xl p-4 shimmer h-16 w-full mb-2"></div>
+                <div class="rounded-2xl p-4 shimmer h-16 w-full mb-2"></div>
             </div>
         </div>
-
     </main>
 
-    <!-- Floating Action Button (+) -->
-    <button onclick="toggleModal(true)" class="fixed bottom-24 right-6 z-50 h-14 w-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center transform active:scale-95 transition-all">
+    <button onclick="openModal()" class="fixed bottom-24 right-6 z-50 h-14 w-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center active:scale-95 transition-all">
         <iconify-icon icon="solar:add-circle-bold" class="text-2xl"></iconify-icon>
     </button>
 
-    <!-- Fixed Bottom Navigation -->
     <nav class="fixed bottom-0 inset-x-0 z-40 premium-blur border-t border-white/5 px-6 py-3 flex items-center justify-around max-w-md mx-auto rounded-t-3xl">
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-blue-400">
-            <iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon>
-            <span class="text-[10px] font-bold">Home</span>
-        </a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50 cursor-not-allowed">
-            <iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon>
-            <span class="text-[10px] font-bold">History</span>
-        </a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50 cursor-not-allowed">
-            <iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon>
-            <span class="text-[10px] font-bold">Analysis</span>
-        </a>
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-blue-400"><iconify-icon icon="solar:home-smile-angle-bold" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Home</span></a>
+        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50"><iconify-icon icon="solar:document-text-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">History</span></a>
+        <a href="#" class="flex flex-col items-center gap-1 text-slate-500 opacity-50"><iconify-icon icon="solar:chart-square-linear" class="text-xl"></iconify-icon><span class="text-[10px] font-bold">Analysis</span></a>
     </nav>
 
-    <!-- Add Transaction Modal -->
     <div id="txModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="w-full max-w-md bg-slate-900 border-t border-white/10 rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative">
-            <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6" onclick="toggleModal(false)"></div>
+        <div class="w-full max-w-md bg-slate-900 border-t border-white/10 rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
+            <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
+            
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-extrabold tracking-tight text-white">Log Transaction</h2>
-                <button onclick="toggleModal(false)" class="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
+                <h2 id="modalTitle" class="text-xl font-extrabold text-white">Log Transaction</h2>
+                <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
             </div>
 
             <form id="transactionForm" class="space-y-4">
+                <input type="hidden" id="txId"> <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Type</label>
+                        <select id="txType" onchange="handleTypeChange()" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 text-sm">
+                            <option value="Expense" class="bg-slate-900 text-rose-400">Expense</option>
+                            <option value="Income" class="bg-slate-900 text-emerald-400">Income</option>
+                            <option value="Transfer" class="bg-slate-900 text-blue-400">Internal Transfer</option>
+                            <option value="Balance Correction" class="bg-slate-900 text-amber-400">Correction</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Date</label>
+                        <input type="date" id="txDate" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 text-sm">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Amount (INR)</label>
-                    <input type="number" step="any" id="txAmount" required placeholder="0.00" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 transition-colors">
+                    <input type="number" step="any" id="txAmount" required placeholder="0.00" class="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl outline-none font-black text-2xl text-white focus:border-blue-500 transition-colors">
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Flow Type</label>
-                    <select id="txType" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-bold text-white focus:border-blue-500 transition-colors">
-                        <option value="Money Out" class="bg-slate-900 text-rose-400 font-bold">Money Out</option>
-                        <option value="Money In" class="bg-slate-900 text-emerald-400 font-bold">Money In</option>
-                    </select>
-                </div>
-
-                <div>
+                <div id="categoryContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Category</label>
-                    <input type="text" id="txCategory" required placeholder="e.g., Food, Salary, Rent" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 transition-colors">
+                    <select id="txCategorySelect" onchange="handleCategoryChange()" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 mb-2">
+                        </select>
+                    <input type="text" id="txCategoryCustom" placeholder="Type custom category..." class="hidden w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Wallet / Mode</label>
-                    <select id="txWallet" class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500 transition-colors">
+                <div id="walletSection">
+                    <label id="walletLabel" class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Wallet Account</label>
+                    <select id="txWallet" required class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
                         <option value="Cash" class="bg-slate-900">Cash</option>
                         <option value="UPI" class="bg-slate-900">UPI / Digital</option>
-                        <option value="Bank Account" class="bg-slate-900">Bank Account</option>
-                        <option value="Credit Card" class="bg-slate-900">Cards</option>
+                        <option value="Bank" class="bg-slate-900">Bank Account</option>
+                        <option value="Card" class="bg-slate-900">Cards</option>
                     </select>
                 </div>
 
-                <button type="submit" id="saveTxBtn" class="w-full py-4 mt-2 bg-blue-600 text-white font-bold rounded-xl shadow-lg transform active:scale-95 flex items-center justify-center gap-2">
-                    Save Transaction <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon>
-                </button>
+                <div id="transferToSection" class="hidden">
+                    <label class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1.5">Transfer TO Wallet</label>
+                    <select id="txWalletTo" class="w-full px-4 py-3.5 bg-white/5 border border-blue-500/30 rounded-xl outline-none font-semibold text-white focus:border-blue-500">
+                        <option value="Cash" class="bg-slate-900">Cash</option>
+                        <option value="UPI" class="bg-slate-900">UPI / Digital</option>
+                        <option value="Bank" class="bg-slate-900">Bank Account</option>
+                        <option value="Card" class="bg-slate-900">Cards</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Notes (Optional)</label>
+                    <input type="text" id="txNotes" placeholder="Details..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl outline-none text-sm text-white focus:border-blue-500">
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" id="deleteBtn" onclick="deleteTransaction()" class="hidden w-1/3 py-4 bg-rose-600/20 text-rose-500 border border-rose-500/30 font-bold rounded-xl active:scale-95">
+                        <iconify-icon icon="solar:trash-bin-trash-linear" class="text-xl"></iconify-icon>
+                    </button>
+                    <button type="submit" id="saveTxBtn" class="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg active:scale-95 flex items-center justify-center gap-2 transition-all">
+                        Save <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -175,87 +179,176 @@
     <script src="js/config.js"></script>
     <script>
         if (!localStorage.getItem('token')) window.location.href = 'login.html';
+        
+        // Setup Date Default
+        document.getElementById('txDate').valueAsDate = new Date();
+        
+        let globalTxData = [];
 
-        function toggleModal(open) {
-            const container = document.getElementById('txModal');
-            if (open) {
-                container.classList.remove('pointer-events-none', 'opacity-0');
-                container.classList.add('modal-active', 'opacity-100');
+        // Category Logic
+        const categories = {
+            Expense: ['Food & Dining', 'Transport', 'Rent', 'Utilities & Bills', 'Shopping', 'Entertainment', 'Health', 'Other'],
+            Income: ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Refund', 'Other'],
+            Transfer: ['Internal Transfer'],
+            "Balance Correction": ['Adjustment']
+        };
+
+        function handleTypeChange() {
+            const type = document.getElementById('txType').value;
+            const select = document.getElementById('txCategorySelect');
+            const customInput = document.getElementById('txCategoryCustom');
+            const transferTo = document.getElementById('transferToSection');
+            const walletLabel = document.getElementById('walletLabel');
+            
+            // Handle Dropdowns
+            select.innerHTML = categories[type].map(c => `<option value="${c}" class="bg-slate-900">${c}</option>`).join('');
+            
+            // Handle Custom Input
+            handleCategoryChange();
+
+            // Handle Transfer Logic (Hide categories, show "To" wallet)
+            if (type === 'Transfer') {
+                document.getElementById('categoryContainer').classList.add('hidden');
+                transferTo.classList.remove('hidden');
+                walletLabel.innerText = "Transfer FROM Wallet";
             } else {
-                container.classList.remove('modal-active', 'opacity-100');
-                container.classList.add('pointer-events-none', 'opacity-0');
+                document.getElementById('categoryContainer').classList.remove('hidden');
+                transferTo.classList.add('hidden');
+                walletLabel.innerText = "Wallet Account";
             }
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'login.html';
+        function handleCategoryChange() {
+            const val = document.getElementById('txCategorySelect').value;
+            const custom = document.getElementById('txCategoryCustom');
+            if(val === 'Other') {
+                custom.classList.remove('hidden'); custom.required = true;
+            } else {
+                custom.classList.add('hidden'); custom.required = false; custom.value = '';
+            }
         }
 
-        async function fetchDashboardMetrics() {
+        function openModal(txId = null) {
+            const modal = document.getElementById('txModal');
+            const form = document.getElementById('transactionForm');
+            const delBtn = document.getElementById('deleteBtn');
+            const title = document.getElementById('modalTitle');
+            
+            form.reset();
+            document.getElementById('txDate').valueAsDate = new Date();
+            handleTypeChange();
+
+            if (txId) {
+                // Editing existing
+                title.innerText = "Edit Transaction";
+                delBtn.classList.remove('hidden');
+                
+                const tx = globalTxData.find(t => t.id === txId);
+                document.getElementById('txId').value = tx.id;
+                document.getElementById('txAmount').value = tx.amount;
+                document.getElementById('txType').value = tx.type;
+                handleTypeChange(); // Re-populate dropdowns
+                
+                // Set category
+                const catSelect = document.getElementById('txCategorySelect');
+                if (categories[tx.type].includes(tx.category)) {
+                    catSelect.value = tx.category;
+                } else {
+                    catSelect.value = 'Other';
+                    document.getElementById('txCategoryCustom').classList.remove('hidden');
+                    document.getElementById('txCategoryCustom').value = tx.category;
+                }
+                
+                document.getElementById('txWallet').value = tx.wallet;
+                document.getElementById('txDate').value = tx.date.split('T')[0];
+                document.getElementById('txNotes').value = tx.notes || '';
+                
+                // Transfers can't be strictly edited back into dual-wallets easily, so we lock the "To" wallet and just edit the raw DB entry.
+                if(tx.type === 'Transfer') document.getElementById('transferToSection').classList.add('hidden');
+
+            } else {
+                // New
+                title.innerText = "Log Transaction";
+                delBtn.classList.add('hidden');
+                document.getElementById('txId').value = '';
+            }
+
+            modal.classList.remove('pointer-events-none', 'opacity-0');
+            modal.classList.add('modal-active', 'opacity-100');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('txModal');
+            modal.classList.remove('modal-active', 'opacity-100');
+            modal.classList.add('pointer-events-none', 'opacity-0');
+        }
+
+        async function fetchDashboard() {
             try {
-                const response = await fetch(`${API_BASE_URL}/transactions`, {
-                    method: 'GET', headers: getAuthHeaders()
-                });
+                const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error('Auth failed');
+                
+                globalTxData = await res.json();
+                
+                let net = 0, inc = 0, exp = 0;
+                let w = { Cash: 0, UPI: 0, Bank: 0, Card: 0 };
 
-                if (!response.ok) throw new Error('Auth failed');
-                const txList = await response.json();
-
-                let netBalance = 0, moneyInTotal = 0, moneyOutTotal = 0;
-                let balances = { Cash: 0, UPI: 0, "Bank Account": 0, "Credit Card": 0 };
-
-                txList.forEach(tx => {
+                globalTxData.forEach(tx => {
                     const amt = parseFloat(tx.amount);
-                    if (tx.type === 'Money In') {
-                        moneyInTotal += amt; netBalance += amt;
-                        if(balances[tx.wallet] !== undefined) balances[tx.wallet] += amt;
-                    } else if (tx.type === 'Money Out') {
-                        moneyOutTotal += amt; netBalance -= amt;
-                        if(balances[tx.wallet] !== undefined) balances[tx.wallet] -= amt;
+                    if (tx.type === 'Income') { inc += amt; net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt; } 
+                    else if (tx.type === 'Expense') { exp += amt; net -= amt; if(w[tx.wallet]!==undefined) w[tx.wallet] -= amt; }
+                    else if (tx.type === 'Balance Correction') {
+                        // Correction directly sets wallet value logic (Simplified: acts as absolute injection)
+                        net += amt; if(w[tx.wallet]!==undefined) w[tx.wallet] += amt;
+                    }
+                    else if (tx.type === 'Transfer') {
+                        // Transfers are handled as two transactions in our save function. 
+                        // So here, a negative transfer means out, positive means in.
+                        if(w[tx.wallet]!==undefined) w[tx.wallet] += amt;
                     }
                 });
 
-                document.getElementById('totalBalance').innerText = `\u20B9${netBalance.toLocaleString('en-IN')}`;
-                document.getElementById('totalIn').innerText = `\u20B9${moneyInTotal.toLocaleString('en-IN')}`;
-                document.getElementById('totalOut').innerText = `\u20B9${moneyOutTotal.toLocaleString('en-IN')}`;
-                document.getElementById('walletCash').innerText = `\u20B9${balances.Cash.toLocaleString('en-IN')}`;
-                document.getElementById('walletUPI').innerText = `\u20B9${balances.UPI.toLocaleString('en-IN')}`;
-                document.getElementById('walletBank').innerText = `\u20B9${balances["Bank Account"].toLocaleString('en-IN')}`;
-                document.getElementById('walletCard').innerText = `\u20B9${balances["Credit Card"].toLocaleString('en-IN')}`;
+                document.getElementById('totalBalance').innerText = `\u20B9${net.toLocaleString('en-IN')}`;
+                document.getElementById('totalIn').innerText = `\u20B9${inc.toLocaleString('en-IN')}`;
+                document.getElementById('totalOut').innerText = `\u20B9${exp.toLocaleString('en-IN')}`;
+                document.getElementById('walletCash').innerText = `\u20B9${w.Cash.toLocaleString('en-IN')}`;
+                document.getElementById('walletUPI').innerText = `\u20B9${w.UPI.toLocaleString('en-IN')}`;
+                document.getElementById('walletBank').innerText = `\u20B9${w.Bank.toLocaleString('en-IN')}`;
+                document.getElementById('walletCard').innerText = `\u20B9${w.Card.toLocaleString('en-IN')}`;
 
-                renderLedgerFeed(txList.slice(0, 10));
-            } catch (err) {
-                logout();
-            }
+                renderFeed(globalTxData.slice(0, 15));
+            } catch (err) { logout(); }
         }
 
-        function renderLedgerFeed(transactions) {
+        function renderFeed(data) {
             const container = document.getElementById('transactionContainer');
-            if (transactions.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 font-medium text-sm"><iconify-icon icon="solar:box-minimalistic-broken" class="text-3xl mb-1 block mx-auto opacity-50"></iconify-icon>No transactions yet</div>`;
+            if (data.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm"><iconify-icon icon="solar:box-minimalistic-broken" class="text-3xl block mx-auto opacity-50 mb-1"></iconify-icon>No transactions yet</div>`;
                 return;
             }
 
-            container.innerHTML = transactions.map(tx => {
-                const isMoneyIn = tx.type === 'Money In';
-                const colorClass = isMoneyIn ? 'text-emerald-400' : 'text-rose-400';
-                const bgIcon = isMoneyIn ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/10' : 'bg-rose-500/10 text-rose-400 border-rose-500/10';
+            container.innerHTML = data.map(tx => {
+                let color = 'text-slate-400', sign = '', icon = 'solar:refresh-linear', border = 'border-l-slate-500';
+                if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) {
+                    color = 'text-emerald-400'; sign = '+'; icon = 'solar:arrow-left-down-bold'; border = 'border-l-emerald-500';
+                } else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) {
+                    color = 'text-rose-400'; sign = ''; icon = 'solar:arrow-right-up-bold'; border = 'border-l-rose-500';
+                }
                 const dateObj = new Date(tx.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 
                 return `
-                    <div class="premium-card rounded-2xl p-4 flex items-center justify-between border-l-4 ${isMoneyIn ? 'border-l-emerald-500' : 'border-l-rose-500'}">
+                    <div onclick="openModal('${tx.id}')" class="premium-card rounded-2xl p-4 flex items-center justify-between border-l-4 ${border}">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center border ${bgIcon}">
-                                <iconify-icon icon="${isMoneyIn ? 'solar:arrow-left-down-bold' : 'solar:arrow-right-up-bold'}" class="text-lg"></iconify-icon>
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 text-slate-300">
+                                <iconify-icon icon="${icon}" class="text-lg"></iconify-icon>
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-slate-100">${tx.category}</p>
                                 <p class="text-[10px] font-semibold text-slate-400">${dateObj} &bull; ${tx.wallet}</p>
                             </div>
                         </div>
-                        <p class="text-sm font-black ${colorClass}">${isMoneyIn ? '+' : '-'}\u20B9${parseFloat(tx.amount).toLocaleString('en-IN')}</p>
-                    </div>
-                `;
+                        <p class="text-sm font-black ${color}">${sign}\u20B9${parseFloat(tx.amount).toLocaleString('en-IN')}</p>
+                    </div>`;
             }).join('');
         }
 
@@ -264,28 +357,62 @@
             const btn = document.getElementById('saveTxBtn');
             btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin text-xl"></iconify-icon>';
 
-            const tx = {
-                amount: document.getElementById('txAmount').value,
-                type: document.getElementById('txType').value,
-                category: document.getElementById('txCategory').value,
-                wallet: document.getElementById('txWallet').value
+            const id = document.getElementById('txId').value;
+            const type = document.getElementById('txType').value;
+            let cat = document.getElementById('txCategorySelect').value;
+            if (cat === 'Other') cat = document.getElementById('txCategoryCustom').value;
+            
+            const rawAmount = parseFloat(document.getElementById('txAmount').value);
+            
+            // Build Base Payload
+            const payload = {
+                type: type,
+                amount: rawAmount,
+                category: cat,
+                wallet: document.getElementById('txWallet').value,
+                date: document.getElementById('txDate').value,
+                notes: document.getElementById('txNotes').value
             };
 
             try {
-                const res = await fetch(`${API_BASE_URL}/transactions`, {
-                    method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(tx)
-                });
-                if (res.ok) {
-                    document.getElementById('transactionForm').reset();
-                    toggleModal(false);
-                    fetchDashboardMetrics();
+                // Handle Transfer Special Logic (Creates 2 transactions)
+                if (type === 'Transfer' && !id) {
+                    const walletTo = document.getElementById('txWalletTo').value;
+                    if (payload.wallet === walletTo) throw new Error("Cannot transfer to same wallet");
+                    
+                    // Outgoing
+                    await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: -rawAmount, category: 'Internal Transfer'}) });
+                    // Incoming
+                    await fetch(`${API_BASE_URL}/transactions`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({...payload, amount: rawAmount, wallet: walletTo, category: 'Internal Transfer'}) });
+                } else {
+                    // Standard Save / Update
+                    const url = id ? `${API_BASE_URL}/transactions/${id}` : `${API_BASE_URL}/transactions`;
+                    const method = id ? 'PUT' : 'POST';
+                    
+                    // If balance correction is negative, format it
+                    if(type === 'Balance Correction' && document.getElementById('txAmount').value < 0) payload.amount = rawAmount; 
+
+                    await fetch(url, { method, headers: getAuthHeaders(), body: JSON.stringify(payload) });
                 }
-            } finally {
-                btn.innerHTML = 'Save Transaction <iconify-icon icon="solar:check-circle-linear" class="text-lg"></iconify-icon>';
-            }
+
+                closeModal(); fetchDashboard();
+            } catch (err) { alert(err.message || 'Error saving'); }
+            finally { btn.innerHTML = 'Save <iconify-icon icon="solar:check-circle-linear"></iconify-icon>'; }
         });
 
-        window.onload = fetchDashboardMetrics;
+        async function deleteTransaction() {
+            if(!confirm("Delete this transaction permanently?")) return;
+            const id = document.getElementById('txId').value;
+            const btn = document.getElementById('deleteBtn');
+            btn.innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
+            
+            await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+            closeModal(); fetchDashboard();
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+        
+        window.onload = () => { handleTypeChange(); fetchDashboard(); };
     </script>
 </body>
 </html>
