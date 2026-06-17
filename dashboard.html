@@ -22,7 +22,6 @@
 </head>
 <body class="pb-32 antialiased min-h-screen relative">
 
-    <!-- Beautiful In-App Toast Notification -->
     <div id="toast" class="fixed top-[-100%] left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 pointer-events-none">
         <div class="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-3 border border-slate-700">
             <iconify-icon id="toastIcon" icon="solar:check-circle-bold" class="text-emerald-400 text-xl"></iconify-icon>
@@ -122,6 +121,12 @@
                 <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
             </div>
 
+            <!-- BUG 1 FIX: The Warning Banner for Transfers -->
+            <div id="transferWarning" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 items-start">
+                <iconify-icon icon="solar:danger-triangle-bold-duotone" class="text-amber-500 text-xl shrink-0 mt-0.5"></iconify-icon>
+                <p class="text-xs text-amber-800 font-medium leading-tight">Transfers are saved as two separate records. If you delete or edit the amount here, ensure you update the other half manually.</p>
+            </div>
+
             <form id="transactionForm" class="space-y-4">
                 <input type="hidden" id="txId">
                 <div class="grid grid-cols-2 gap-3">
@@ -178,16 +183,21 @@
         let globalTxData = [];
         let isPrivacyMode = false;
 
+        // BUG 3 FIX: Correct Timezone calculation for input[type=date]
+        function getLocalISODate() {
+            const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+            return (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);
+        }
+
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = message;
             document.getElementById('toastIcon').className = isError ? "text-rose-400 text-xl" : "text-emerald-400 text-xl";
             document.getElementById('toastIcon').setAttribute('icon', isError ? "solar:danger-circle-bold" : "solar:check-circle-bold");
             
-            toast.style.top = "2.5rem"; // Slide down
-            if(navigator.vibrate) navigator.vibrate(isError ? [50, 50, 50] : 50); // Haptic Feedback
-            
-            setTimeout(() => { toast.style.top = "-100%"; }, 3000); // Slide up
+            toast.style.top = "2.5rem";
+            if(navigator.vibrate) navigator.vibrate(isError ? [50, 50, 50] : 50); 
+            setTimeout(() => { toast.style.top = "-100%"; }, 3000);
         }
 
         function togglePrivacy() {
@@ -218,7 +228,13 @@
         function openModal(txId = null) {
             if(navigator.vibrate) navigator.vibrate(20);
             const modal = document.getElementById('txModal');
-            document.getElementById('transactionForm').reset(); document.getElementById('txDate').valueAsDate = new Date(); handleTypeChange();
+            document.getElementById('transactionForm').reset(); 
+            
+            document.getElementById('txDate').value = getLocalISODate(); // Fixed local date injection
+            
+            handleTypeChange();
+            document.getElementById('transferWarning').classList.add('hidden'); // Reset warning
+            
             if (txId) {
                 document.getElementById('modalTitle').innerText = "Edit Transaction"; document.getElementById('deleteBtn').classList.remove('hidden');
                 const tx = globalTxData.find(t => t.id === txId);
@@ -227,7 +243,12 @@
                 const catSelect = document.getElementById('txCategorySelect');
                 if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
                 document.getElementById('txWallet').value = tx.wallet; document.getElementById('txDate').value = tx.date.split('T')[0]; document.getElementById('txNotes').value = tx.notes || '';
-                if(tx.type === 'Transfer') document.getElementById('transferToSection').classList.add('hidden');
+                
+                // Show Bug 1 Warning if editing a transfer
+                if(tx.type === 'Transfer') {
+                    document.getElementById('transferToSection').classList.add('hidden');
+                    document.getElementById('transferWarning').classList.remove('hidden');
+                }
             } else {
                 document.getElementById('modalTitle').innerText = "Log Transaction"; document.getElementById('deleteBtn').classList.add('hidden'); document.getElementById('txId').value = '';
             }
@@ -247,8 +268,6 @@
             let net = 0, inc = 0, exp = 0, currentMonthExp = 0;
             let w = { Cash: 0, UPI: 0, Bank: 0, Card: 0 };
             const currMonth = new Date().getMonth();
-            
-            // Read Custom Budget Limit (defaults to 25000 if not set)
             const MONTHLY_BUDGET_LIMIT = parseFloat(localStorage.getItem('budgetLimit')) || 25000;
 
             globalTxData.forEach(tx => {
@@ -310,8 +329,7 @@
                     if(type === 'Balance Correction' && document.getElementById('txAmount').value < 0) payload.amount = rawAmount; 
                     await fetch(url, { method, headers: getAuthHeaders(), body: JSON.stringify(payload) });
                 }
-                closeModal(); fetchDashboard();
-                showToast("Transaction saved!");
+                closeModal(); fetchDashboard(); showToast("Transaction saved!");
             } catch (err) { showToast(err.message || 'Error saving', true); }
             finally { btn.innerHTML = 'Save <iconify-icon icon="solar:check-circle-linear"></iconify-icon>'; }
         });
@@ -321,8 +339,7 @@
             const id = document.getElementById('txId').value; document.getElementById('deleteBtn').innerHTML = '<iconify-icon icon="solar:spinner-linear" class="animate-spin"></iconify-icon>';
             try {
                 await fetch(`${API_BASE_URL}/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() }); 
-                closeModal(); fetchDashboard();
-                showToast("Transaction deleted");
+                closeModal(); fetchDashboard(); showToast("Transaction deleted");
             } catch(err) { showToast("Error deleting", true); }
         }
         
@@ -330,4 +347,3 @@
     </script>
 </body>
 </html>
-
