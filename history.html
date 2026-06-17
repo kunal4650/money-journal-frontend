@@ -20,22 +20,51 @@
 
     <nav class="sticky top-0 z-40 glass-header px-6 py-4">
         <h1 class="text-lg font-extrabold tracking-tight text-slate-900">Full Ledger</h1>
-        <p class="text-[10px] font-semibold text-slate-500">Search and filter all records</p>
+        <p class="text-[10px] font-semibold text-slate-500">Search and filter your history</p>
     </nav>
 
-    <main class="max-w-md mx-auto px-4 pt-6 space-y-4 page-enter">
-        <div class="flex gap-2">
-            <div class="relative flex-1">
-                <iconify-icon icon="solar:magnifer-linear" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></iconify-icon>
-                <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search records..." class="w-full pl-10 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:border-emerald-500 shadow-sm">
+    <main class="max-w-md mx-auto px-4 pt-6 page-enter">
+        
+        <!-- Filter Controls -->
+        <div class="space-y-3">
+            <div class="relative w-full">
+                <iconify-icon icon="solar:magnifer-linear" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></iconify-icon>
+                <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Search categories, notes..." class="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:border-emerald-500 shadow-sm transition-colors">
             </div>
-            <select id="filterType" onchange="filterData()" class="px-4 py-3.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-emerald-500 shadow-sm">
-                <option value="All">All</option><option value="Income">Income</option><option value="Expense">Expense</option>
-            </select>
+            
+            <div class="flex gap-2">
+                <!-- Dynamic Month Filter -->
+                <div class="relative flex-1">
+                    <select id="filterMonth" onchange="filterData()" class="w-full pl-4 pr-8 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-emerald-500 shadow-sm transition-colors cursor-pointer">
+                        <option value="All">All Time</option>
+                        <!-- Populated via JS -->
+                    </select>
+                    <iconify-icon icon="solar:alt-arrow-down-linear" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></iconify-icon>
+                </div>
+
+                <!-- Type Filter -->
+                <div class="relative flex-1">
+                    <select id="filterType" onchange="filterData()" class="w-full pl-4 pr-8 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-emerald-500 shadow-sm transition-colors cursor-pointer">
+                        <option value="All">All Types</option>
+                        <option value="Income">Income Only</option>
+                        <option value="Expense">Expense Only</option>
+                    </select>
+                    <iconify-icon icon="solar:alt-arrow-down-linear" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></iconify-icon>
+                </div>
+            </div>
         </div>
 
+        <!-- Smart Filter Summary (Appears when filtering) -->
+        <div id="filterSummary" class="hidden bg-slate-50 border border-slate-200 rounded-2xl p-4 mt-4 flex items-center justify-between shadow-sm">
+            <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filtered Income</p><p id="sumInc" class="text-sm font-black text-emerald-600">₹0</p></div>
+            <div class="text-right"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filtered Expense</p><p id="sumExp" class="text-sm font-black text-rose-500">₹0</p></div>
+        </div>
+
+        <!-- Transaction Feed -->
         <div id="fullTransactionContainer" class="space-y-3 mt-4">
-            <div class="text-center py-8 text-slate-400 text-sm"><iconify-icon icon="solar:spinner-linear" class="animate-spin text-3xl block mx-auto mb-2"></iconify-icon>Loading...</div>
+            <div class="text-center py-12 text-slate-400 text-sm">
+                <iconify-icon icon="solar:spinner-linear" class="animate-spin text-3xl block mx-auto mb-2"></iconify-icon>Loading records...
+            </div>
         </div>
     </main>
 
@@ -58,38 +87,102 @@
             try {
                 const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
                 if (!res.ok) throw new Error();
-                allTx = await res.json(); renderHistory(allTx);
+                allTx = await res.json(); 
+                
+                populateMonthDropdown();
+                renderHistory(allTx, false); // false = don't show summary for standard view
             } catch (err) { alert('Failed to load history.'); }
         }
 
+        // Dynamically find all unique months from the user's data
+        function populateMonthDropdown() {
+            const select = document.getElementById('filterMonth');
+            const uniqueMonths = {};
+            
+            allTx.forEach(tx => {
+                const dateObj = new Date(tx.date);
+                // Create a sortable key like "2026-06"
+                const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+                // Create readable label like "Jun 2026"
+                const label = dateObj.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                uniqueMonths[key] = label;
+            });
+
+            // Sort keys descending (Newest month at the top)
+            const sortedKeys = Object.keys(uniqueMonths).sort((a, b) => b.localeCompare(a));
+            
+            let html = '<option value="All">All Time</option>';
+            sortedKeys.forEach(key => {
+                html += `<option value="${key}">${uniqueMonths[key]}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
         function filterData() {
-            const query = document.getElementById('searchInput').value.toLowerCase(); const type = document.getElementById('filterType').value;
+            const query = document.getElementById('searchInput').value.toLowerCase(); 
+            const type = document.getElementById('filterType').value;
+            const month = document.getElementById('filterMonth').value;
+
+            const isFiltering = query !== '' || type !== 'All' || month !== 'All';
+
             const filtered = allTx.filter(tx => {
                 const matchesText = tx.category.toLowerCase().includes(query) || (tx.notes && tx.notes.toLowerCase().includes(query));
                 const matchesType = type === 'All' || tx.type === type;
-                return matchesText && matchesType;
+                
+                let matchesMonth = true;
+                if (month !== 'All') {
+                    const txDate = new Date(tx.date);
+                    const txMonthKey = `${txDate.getFullYear()}-${String(txDate.getMonth() + 1).padStart(2, '0')}`;
+                    matchesMonth = (txMonthKey === month);
+                }
+                
+                return matchesText && matchesType && matchesMonth;
             });
-            renderHistory(filtered);
+            
+            renderHistory(filtered, isFiltering);
         }
 
-        function renderHistory(data) {
+        function renderHistory(data, isFiltering) {
             const container = document.getElementById('fullTransactionContainer');
-            if (data.length === 0) { container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No records found</div>`; return; }
+            const summaryBox = document.getElementById('filterSummary');
+            
+            // Calculate and show summary if user is actively filtering
+            if (isFiltering) {
+                let sInc = 0, sExp = 0;
+                data.forEach(tx => {
+                    const amt = parseFloat(tx.amount);
+                    if (tx.type === 'Income') sInc += amt;
+                    if (tx.type === 'Expense') sExp += amt;
+                });
+                document.getElementById('sumInc').innerText = `₹${sInc.toLocaleString('en-IN')}`;
+                document.getElementById('sumExp').innerText = `₹${sExp.toLocaleString('en-IN')}`;
+                summaryBox.classList.remove('hidden');
+            } else {
+                summaryBox.classList.add('hidden');
+            }
 
+            // Render empty state
+            if (data.length === 0) { 
+                container.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm"><div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"><iconify-icon icon="solar:folder-error-bold-duotone" class="text-3xl text-slate-300"></iconify-icon></div>No records match your search</div>`; 
+                return; 
+            }
+
+            // Render items
             container.innerHTML = data.map(tx => {
                 let color = 'text-slate-500', sign = '', icon = 'solar:refresh-linear', bg = 'bg-slate-100';
                 if(tx.type === 'Income' || (tx.type === 'Transfer' && tx.amount > 0) || (tx.type === 'Balance Correction' && tx.amount > 0)) { color = 'text-emerald-600'; sign = '+'; icon = 'solar:arrow-left-down-bold'; bg = 'bg-emerald-50 text-emerald-600'; } 
                 else if (tx.type === 'Expense' || (tx.type === 'Transfer' && tx.amount < 0) || (tx.type === 'Balance Correction' && tx.amount < 0)) { color = 'text-slate-900'; sign = ''; icon = 'solar:arrow-right-up-bold'; bg = 'bg-rose-50 text-rose-500'; }
                 const dateObj = new Date(tx.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-                return `<div class="premium-card rounded-2xl p-4 flex items-center justify-between">
+                return `<div class="premium-card rounded-2xl p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                         <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center ${bg}"><iconify-icon icon="${icon}" class="text-lg"></iconify-icon></div>
                         <div><p class="text-sm font-bold text-slate-800">${tx.category}</p><p class="text-[10px] font-semibold text-slate-500">${dateObj} &bull; ${tx.wallet}</p></div></div>
-                        <p class="text-sm font-black ${color}">${sign}₹${parseFloat(Math.abs(tx.amount)).toLocaleString('en-IN')}</p></div>`;
+                        <div class="text-right"><p class="text-sm font-black ${color}">${sign}₹${parseFloat(Math.abs(tx.amount)).toLocaleString('en-IN')}</p>
+                        ${tx.notes ? `<p class="text-[9px] text-slate-400 max-w-[100px] truncate">${tx.notes}</p>` : ''}</div></div>`;
             }).join('');
         }
+        
         window.onload = loadHistory;
     </script>
 </body>
 </html>
-
