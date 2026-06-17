@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- NATIVE MOBILE APP BRANDING -->
     <meta name="theme-color" content="#f8fafc">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -24,6 +25,12 @@
         .modal-active .modal-animate { transform: translateY(0); }
         input, select, button { -webkit-tap-highlight-color: transparent; outline: none; }
     </style>
+    
+    <!-- VERCEL NATIVE WEB ANALYTICS -->
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class="pb-32 antialiased min-h-screen relative">
 
@@ -97,6 +104,7 @@
 
         <div>
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">Recent Activity</h3>
+            <!-- SHIMMERING SKELETON LOADER -->
             <div id="transactionContainer" class="space-y-3 pb-4">
                 <div class="premium-card rounded-2xl p-4 flex items-center justify-between animate-pulse">
                     <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-200"></div><div><div class="h-3 w-24 bg-slate-200 rounded mb-1.5"></div><div class="h-2 w-16 bg-slate-100 rounded"></div></div></div><div class="h-4 w-16 bg-slate-200 rounded"></div>
@@ -124,6 +132,7 @@
         </nav>
     </div>
 
+    <!-- Light Theme Modal -->
     <div id="txModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="w-full max-w-md bg-white rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
