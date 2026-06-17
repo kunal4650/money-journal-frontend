@@ -23,19 +23,27 @@
         <p class="text-[10px] font-semibold text-slate-500">Your financial breakdown</p>
     </nav>
 
-    <main class="max-w-md mx-auto px-4 pt-6 space-y-6 page-enter">
-        <div class="premium-card rounded-[2rem] p-6">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Expenses by Category</h3>
-            <div class="relative w-full h-64"><canvas id="expenseChart"></canvas></div>
+    <main class="max-w-md mx-auto px-4 pt-6 space-y-6 page-enter" id="mainContent">
+        <!-- If empty, this state shows -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4"><iconify-icon icon="solar:pie-chart-2-bold-duotone" class="text-3xl"></iconify-icon></div>
+            <h2 class="text-lg font-bold text-slate-800 mb-1">No Data Yet</h2>
+            <p class="text-xs text-slate-500">Log some transactions on the Dashboard to see your analytics.</p>
         </div>
 
-        <div class="premium-card rounded-[2rem] p-6">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Income vs Expense</h3>
-            <div class="relative w-full h-56"><canvas id="cashflowChart"></canvas></div>
+        <div id="chartsContainer" class="hidden space-y-6">
+            <div class="premium-card rounded-[2rem] p-6">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Expenses by Category</h3>
+                <div class="relative w-full h-64"><canvas id="expenseChart"></canvas></div>
+            </div>
+
+            <div class="premium-card rounded-[2rem] p-6">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Income vs Expense</h3>
+                <div class="relative w-full h-56"><canvas id="cashflowChart"></canvas></div>
+            </div>
         </div>
     </main>
 
-    <!-- Floating Pill Navigation -->
     <div class="fixed bottom-6 inset-x-0 z-40 flex justify-center px-6 pointer-events-none">
         <nav class="w-full max-w-md bg-white/90 backdrop-blur-xl border border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between pointer-events-auto">
             <a href="dashboard.html" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600"><iconify-icon icon="solar:home-smile-angle-linear" class="text-xl"></iconify-icon></a>
@@ -48,15 +56,20 @@
     <script src="js/config.js"></script>
     <script>
         if (!localStorage.getItem('token')) window.location.href = 'login.html';
-        
-        Chart.defaults.color = '#64748b'; // Slate-500 for light mode
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748b'; Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
         async function loadAnalytics() {
             try {
                 const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
                 if (!res.ok) throw new Error(); const txData = await res.json();
                 
+                if (txData.length === 0) {
+                    document.getElementById('emptyState').classList.remove('hidden');
+                    return;
+                }
+                
+                document.getElementById('chartsContainer').classList.remove('hidden');
+
                 let categories = {}; let totalInc = 0, totalExp = 0;
                 txData.forEach(tx => {
                     const amt = parseFloat(tx.amount);
