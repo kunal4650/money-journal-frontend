@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://api.iconify.design/solar/wallet-money-bold-duotone.svg?color=%2310b981&width=192&height=192">
+    
     <title>Dashboard - MyExpenseJournal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
@@ -93,7 +98,15 @@
         <div>
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">Recent Activity</h3>
             <div id="transactionContainer" class="space-y-3 pb-4">
-                <div class="text-center py-6 text-slate-400 text-sm"><iconify-icon icon="solar:spinner-linear" class="animate-spin text-2xl"></iconify-icon></div>
+                <div class="premium-card rounded-2xl p-4 flex items-center justify-between animate-pulse">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-200"></div><div><div class="h-3 w-24 bg-slate-200 rounded mb-1.5"></div><div class="h-2 w-16 bg-slate-100 rounded"></div></div></div><div class="h-4 w-16 bg-slate-200 rounded"></div>
+                </div>
+                <div class="premium-card rounded-2xl p-4 flex items-center justify-between animate-pulse">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-200"></div><div><div class="h-3 w-20 bg-slate-200 rounded mb-1.5"></div><div class="h-2 w-12 bg-slate-100 rounded"></div></div></div><div class="h-4 w-12 bg-slate-200 rounded"></div>
+                </div>
+                <div class="premium-card rounded-2xl p-4 flex items-center justify-between animate-pulse">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-200"></div><div><div class="h-3 w-28 bg-slate-200 rounded mb-1.5"></div><div class="h-2 w-14 bg-slate-100 rounded"></div></div></div><div class="h-4 w-14 bg-slate-200 rounded"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -111,7 +124,6 @@
         </nav>
     </div>
 
-    <!-- Light Theme Modal -->
     <div id="txModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="w-full max-w-md bg-white rounded-t-[2.5rem] p-6 modal-animate shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" onclick="closeModal()"></div>
@@ -121,7 +133,6 @@
                 <button onclick="closeModal()" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><iconify-icon icon="solar:close-circle-linear" class="text-lg"></iconify-icon></button>
             </div>
 
-            <!-- BUG 1 FIX: The Warning Banner for Transfers -->
             <div id="transferWarning" class="hidden mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 items-start">
                 <iconify-icon icon="solar:danger-triangle-bold-duotone" class="text-amber-500 text-xl shrink-0 mt-0.5"></iconify-icon>
                 <p class="text-xs text-amber-800 font-medium leading-tight">Transfers are saved as two separate records. If you delete or edit the amount here, ensure you update the other half manually.</p>
@@ -183,7 +194,6 @@
         let globalTxData = [];
         let isPrivacyMode = false;
 
-        // BUG 3 FIX: Correct Timezone calculation for input[type=date]
         function getLocalISODate() {
             const tzoffset = (new Date()).getTimezoneOffset() * 60000;
             return (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);
@@ -230,10 +240,10 @@
             const modal = document.getElementById('txModal');
             document.getElementById('transactionForm').reset(); 
             
-            document.getElementById('txDate').value = getLocalISODate(); // Fixed local date injection
+            document.getElementById('txDate').value = getLocalISODate(); 
             
             handleTypeChange();
-            document.getElementById('transferWarning').classList.add('hidden'); // Reset warning
+            document.getElementById('transferWarning').classList.add('hidden');
             
             if (txId) {
                 document.getElementById('modalTitle').innerText = "Edit Transaction"; document.getElementById('deleteBtn').classList.remove('hidden');
@@ -244,7 +254,6 @@
                 if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
                 document.getElementById('txWallet').value = tx.wallet; document.getElementById('txDate').value = tx.date.split('T')[0]; document.getElementById('txNotes').value = tx.notes || '';
                 
-                // Show Bug 1 Warning if editing a transfer
                 if(tx.type === 'Transfer') {
                     document.getElementById('transferToSection').classList.add('hidden');
                     document.getElementById('transferWarning').classList.remove('hidden');
@@ -347,3 +356,4 @@
     </script>
 </body>
 </html>
+
