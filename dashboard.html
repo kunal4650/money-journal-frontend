@@ -247,39 +247,75 @@
         function openModal(txId = null) {
             if(navigator.vibrate) navigator.vibrate(20);
             const modal = document.getElementById('txModal');
-            document.getElementById('transactionForm').reset(); 
             
-            document.getElementById('txDate').value = getLocalISODate(); 
-            
-            handleTypeChange();
+            // BUG FIX 1: Hard manual clear of every input field so old mobile data never persists
+            document.getElementById('transactionForm').reset();
+            document.getElementById('txId').value = '';
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txNotes').value = '';
+            document.getElementById('txCategoryCustom').value = '';
+            document.getElementById('txCategoryCustom').classList.add('hidden');
+            document.getElementById('txType').value = 'Expense';
+            document.getElementById('txWallet').value = 'Cash';
+            document.getElementById('txDate').value = getLocalISODate();
             document.getElementById('transferWarning').classList.add('hidden');
+            handleTypeChange();
             
-            if (txId) {
-                document.getElementById('modalTitle').innerText = "Edit Transaction"; document.getElementById('deleteBtn').classList.remove('hidden');
+            if (txId && typeof txId === 'string') {
+                document.getElementById('modalTitle').innerText = "Edit Transaction"; 
+                document.getElementById('deleteBtn').classList.remove('hidden');
                 const tx = globalTxData.find(t => t.id === txId);
-                document.getElementById('txId').value = tx.id; document.getElementById('txAmount').value = Math.abs(tx.amount); document.getElementById('txType').value = tx.type;
-                handleTypeChange();
-                const catSelect = document.getElementById('txCategorySelect');
-                if (categories[tx.type].includes(tx.category)) { catSelect.value = tx.category; } else { catSelect.value = 'Other'; document.getElementById('txCategoryCustom').classList.remove('hidden'); document.getElementById('txCategoryCustom').value = tx.category; }
-                document.getElementById('txWallet').value = tx.wallet; document.getElementById('txDate').value = tx.date.split('T')[0]; document.getElementById('txNotes').value = tx.notes || '';
-                
-                if(tx.type === 'Transfer') {
-                    document.getElementById('transferToSection').classList.add('hidden');
-                    document.getElementById('transferWarning').classList.remove('hidden');
+                if (tx) {
+                    document.getElementById('txId').value = tx.id; 
+                    document.getElementById('txAmount').value = Math.abs(tx.amount); 
+                    document.getElementById('txType').value = tx.type;
+                    handleTypeChange();
+                    const catSelect = document.getElementById('txCategorySelect');
+                    if (categories[tx.type].includes(tx.category)) { 
+                        catSelect.value = tx.category; 
+                    } else { 
+                        catSelect.value = 'Other'; 
+                        document.getElementById('txCategoryCustom').classList.remove('hidden'); 
+                        document.getElementById('txCategoryCustom').value = tx.category; 
+                    }
+                    document.getElementById('txWallet').value = tx.wallet; 
+                    document.getElementById('txDate').value = tx.date.split('T')[0]; 
+                    document.getElementById('txNotes').value = tx.notes || '';
+                    
+                    if(tx.type === 'Transfer') {
+                        document.getElementById('transferToSection').classList.add('hidden');
+                        document.getElementById('transferWarning').classList.remove('hidden');
+                    }
                 }
             } else {
-                document.getElementById('modalTitle').innerText = "Log Transaction"; document.getElementById('deleteBtn').classList.add('hidden'); document.getElementById('txId').value = '';
+                document.getElementById('modalTitle').innerText = "Log Transaction"; 
+                document.getElementById('deleteBtn').classList.add('hidden');
             }
-            modal.classList.remove('pointer-events-none', 'opacity-0'); modal.classList.add('modal-active', 'opacity-100');
+            modal.classList.remove('pointer-events-none', 'opacity-0'); 
+            modal.classList.add('modal-active', 'opacity-100');
         }
+        
         function closeModal() { document.getElementById('txModal').classList.remove('modal-active', 'opacity-100'); document.getElementById('txModal').classList.add('pointer-events-none', 'opacity-0'); }
 
         async function fetchDashboard() {
             try {
-                const res = await fetch(`${API_BASE_URL}/transactions`, { headers: getAuthHeaders() });
-                if (!res.ok) throw new Error(); globalTxData = await res.json();
+                // BUG FIX 2: Strict Cache-Busting applied to prevent mobile browsers from serving "vanished" old lists
+                const res = await fetch(`${API_BASE_URL}/transactions?t=${Date.now()}`, { 
+                    headers: getAuthHeaders(),
+                    cache: 'no-store'
+                });
+                
+                // Bonus Fix: Only kick out to login if auth is totally expired, else show network error
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.clear(); window.location.href = 'login.html'; return;
+                }
+                
+                if (!res.ok) throw new Error("Network error"); 
+                globalTxData = await res.json();
                 updateUI();
-            } catch (err) { localStorage.clear(); window.location.href = 'login.html'; }
+            } catch (err) { 
+                showToast("Failed to sync data. Check connection.", true); 
+            }
         }
 
         function updateUI() {
